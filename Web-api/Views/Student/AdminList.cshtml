@@ -1,0 +1,1094 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danh Sách Học Sinh - Admin</title>
+    <!-- Fonts & Icon Packs -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Design Tokens & Theme Variables */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-dark: #3730a3;
+            --accent: #06b6d4;
+            --accent-light: #ecfeff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            
+            /* Shadows & Glassmorphism */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            
+            /* Border Radii */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Transitions */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 40px 24px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.03) 0px, transparent 50%);
+        }
+
+        /* Container Layout */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top Bar */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-info h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .header-info p {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            text-decoration: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(79, 70, 229, 0.4);
+            filter: brightness(1.05);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-main);
+            border-color: var(--text-muted);
+        }
+
+        /* Stats Cards Dashboard Widgets */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(8px);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.blue { background-color: var(--primary-light); color: var(--primary); }
+        .stat-icon.teal { background-color: var(--accent-light); color: var(--accent); }
+        .stat-icon.green { background-color: var(--success-light); color: var(--success); }
+        .stat-icon.orange { background-color: var(--warning-light); color: var(--warning); }
+
+        .stat-info .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .stat-info .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Filter & Search Bar */
+        .filter-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+            min-width: 260px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+            background-color: var(--bg-main);
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Table Card & Table Styling */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .custom-table th {
+            background-color: #f8fafc;
+            padding: 16px 20px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            vertical-align: middle;
+            transition: var(--transition);
+        }
+
+        .custom-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .custom-table tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Table Components (Avatar, Badge, Action buttons) */
+        .student-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .student-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+            background-color: var(--primary-light);
+        }
+
+        .student-details .student-name {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        .student-details .student-email {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-indigo { background-color: var(--primary-light); color: var(--primary); }
+        .badge-pink { background-color: #fce7f3; color: #db2777; }
+        .badge-success { background-color: var(--success-light); color: var(--success); }
+        .badge-warning { background-color: var(--warning-light); color: #d97706; }
+
+        .btn-action-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+        }
+
+        .btn-action-edit {
+            background-color: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .btn-action-edit:hover {
+            background-color: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-action-delete {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .btn-action-delete:hover {
+            background-color: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Empty State Layout */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 14px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Pagination & Footer */
+        .table-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+        }
+
+        .page-link {
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-link:hover:not(.disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .page-link.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-link.disabled {
+            color: var(--text-muted);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Modal Overlay & Box */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.open .modal-box {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8fafc;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background-color: #f8fafc;
+        }
+
+        /* Form Layout */
+        .form-section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @@media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group-full {
+            grid-column: span 2;
+        }
+
+        @@media (max-width: 640px) {
+            .form-group-full {
+                grid-column: span 1;
+            }
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Gender Radio Pills */
+        .gender-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .gender-radio {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .gender-label {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .gender-radio:checked + .gender-label.male {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .gender-radio:checked + .gender-label.female {
+            border-color: #db2777;
+            background-color: #fce7f3;
+            color: #db2777;
+        }
+
+        /* Toggle Switch */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        .switch-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+            transition: var(--transition);
+        }
+
+        .switch-slider::before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .switch-input:checked + .switch-slider {
+            background-color: var(--primary);
+        }
+
+        .switch-input:checked + .switch-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* Avatar Upload Container */
+        .avatar-upload-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .avatar-preview-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: var(--shadow-md);
+            background-color: #f1f5f9;
+            flex-shrink: 0;
+        }
+
+        .avatar-preview-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-upload-box {
+            flex-grow: 1;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .avatar-upload-box:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .avatar-upload-box i {
+            font-size: 24px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .avatar-upload-box p {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <!-- Header -->
+        <header class="header-section">
+            <div class="header-info">
+                <h1>Hệ Thống Quản Lý Học Sinh</h1>
+                <p>Xem danh sách, tìm kiếm và thêm mới thông tin học sinh trong cơ sở dữ liệu.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="fa-solid fa-plus"></i> Thêm Học Sinh Mới
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Grid Widgets -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Tổng số học sinh</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statActive">0</div>
+                    <div class="stat-label">Học sinh đang học</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-user-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statRetained">0</div>
+                    <div class="stat-label">Học sinh bảo lưu</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statClasses">0</div>
+                    <div class="stat-label">Lớp học hiện có</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search & Filter Card -->
+        <section class="filter-card">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm theo Tên, Email hoặc SĐT...">
+            </div>
+            <div class="filter-group">
+                <select id="filterClass" class="filter-select">
+                    <option value="">-- Chọn lớp học --</option>
+                </select>
+                <select id="filterStatus" class="filter-select">
+                    <option value="">-- Trạng thái --</option>
+                    <option value="active">Đang học</option>
+                    <option value="retained">Bảo lưu</option>
+                </select>
+                <button class="btn btn-secondary" id="btnResetFilters">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Đặt lại
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Content Table Card -->
+        <main class="table-card">
+            <div class="table-responsive">
+                <table class="custom-table" id="studentTable">
+                    <thead>
+                        <tr>
+                            <th>Học sinh</th>
+                            <th>Lớp &amp; Khóa học</th>
+                            <th>Giới tính</th>
+                            <th>Ngày sinh</th>
+                            <th>CCCD &amp; SĐT</th>
+                            <th>Địa chỉ</th>
+                            <th>Trạng thái</th>
+                            <th style="width: 100px; text-align: right;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                        <!-- Hãy điền dữ liệu của bạn bằng JS tại đây -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State UI -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">
+                    <i class="fa-regular fa-folder-open"></i>
+                </div>
+                <h3>Không tìm thấy học sinh</h3>
+                <p>Không có kết quả nào phù hợp với bộ lọc tìm kiếm hiện tại.</p>
+            </div>
+
+            <!-- Table Footer & Pagination -->
+            <div class="table-footer">
+                <div class="footer-info" id="footerInfo">
+                    Hiển thị 0 đến 0 trong tổng số 0 học sinh
+                </div>
+                <ul class="pagination" id="pagination">
+                    <!-- Phân trang -->
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <!-- Student Form Modal (Used for both Create and Edit) -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm Mới Học Sinh</h2>
+                <button class="modal-close" onclick="closeStudentModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form id="studentForm">
+                <input type="hidden" id="studentId" name="Id">
+                <div class="modal-body">
+                    
+                    <!-- Form Section: Personal Info -->
+                    <div class="form-section-title">
+                        <i class="fa-solid fa-user"></i> Thông tin cá nhân
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group form-group-full">
+                            <label class="form-label">Ảnh đại diện</label>
+                            <div class="avatar-upload-container">
+                                <div class="avatar-preview-wrapper">
+                                    <img id="avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Avatar Preview">
+                                </div>
+                                <div class="avatar-upload-box" id="avatarUploadBox">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <p>Nhấp vào đây để chọn ảnh hoặc nhập đường dẫn ảnh bên dưới</p>
+                                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" id="imagePath" placeholder="https://example.com/avatar.jpg">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Họ và tên <span style="color:var(--danger)">*</span></label>
+                            <input type="text" class="form-control" id="studentName" required placeholder="Nguyễn Văn A">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Ngày sinh <span style="color:var(--danger)">*</span></label>
+                            <input type="date" class="form-control" id="studentBirthDay" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Giới tính</label>
+                            <div class="gender-group">
+                                <input type="radio" id="genderMale" name="Gender" class="gender-radio" value="true" checked>
+                                <label for="genderMale" class="gender-label male">
+                                    <i class="fa-solid fa-mars"></i> Nam
+                                </label>
+                                
+                                <input type="radio" id="genderFemale" name="Gender" class="gender-radio" value="false">
+                                <label for="genderFemale" class="gender-label female">
+                                    <i class="fa-solid fa-venus"></i> Nữ
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Số định danh / CCCD <span style="color:var(--danger)">*</span></label>
+                            <input type="text" class="form-control" id="studentCitizenId" required placeholder="012345678901">
+                        </div>
+                    </div>
+
+                    <!-- Form Section: Contact Details -->
+                    <div class="form-section-title">
+                        <i class="fa-solid fa-address-book"></i> Thông tin liên hệ
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Email <span style="color:var(--danger)">*</span></label>
+                            <input type="email" class="form-control" id="studentEmail" required placeholder="email@domain.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label>
+                            <input type="tel" class="form-control" id="studentPhone" required placeholder="0901234567">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tỉnh / Thành phố</label>
+                            <input type="text" class="form-control" id="studentProvince" placeholder="Hà Nội">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phường / Xã</label>
+                            <input type="text" class="form-control" id="studentWard" placeholder="Dịch Vọng Hậu">
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label class="form-label">Địa chỉ cụ thể</label>
+                            <input type="text" class="form-control" id="studentAddress" placeholder="Số 10, Ngõ 99, Đường Cầu Giấy">
+                        </div>
+                    </div>
+
+                    <!-- Form Section: Course Details -->
+                    <div class="form-section-title">
+                        <i class="fa-solid fa-graduation-cap"></i> Khóa học &amp; Lớp học
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Khóa học <span style="color:var(--danger)">*</span></label>
+                            <input type="text" class="form-control" id="studentCourse" required placeholder="Công nghệ thông tin K12">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Lớp học <span style="color:var(--danger)">*</span></label>
+                            <input type="text" class="form-control" id="studentClassName" required placeholder="CNTT-01">
+                        </div>
+
+                        <div class="form-group form-group-full">
+                            <label class="switch-container">
+                                <input type="checkbox" class="switch-input" id="studentIsRetained">
+                                <span class="switch-slider"></span>
+                                <span class="form-label">Học sinh bảo lưu (Bảo lưu kết quả học tập)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitModal">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Block - Only basic modal triggers & avatar preview handles -->
+    <script>
+        const modal = document.getElementById('studentModal');
+        const studentForm = document.getElementById('studentForm');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const imagePathInput = document.getElementById('imagePath');
+        const imageInput = document.getElementById('imageInput');
+        const uploadBox = document.getElementById('avatarUploadBox');
+
+        // Toggle Modal
+        function openAddModal() {
+            studentForm.reset();
+            document.getElementById('studentId').value = '';
+            document.getElementById('modalTitle').textContent = 'Thêm Mới Học Sinh';
+            document.getElementById('btnSubmitModal').textContent = 'Lưu thông tin';
+            avatarPreview.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150";
+            
+            // Set default date (18 years ago)
+            const d = new Date();
+            d.setFullYear(d.getFullYear() - 18);
+            document.getElementById('studentBirthDay').value = d.toISOString().split('T')[0];
+
+            modal.classList.add('open');
+        }
+
+        function closeStudentModal() {
+            modal.classList.remove('open');
+        }
+
+
+        // Avatar Preview URL Listener
+        imagePathInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            avatarPreview.src = val !== "" ? val : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150";
+        });
+
+        // Click Upload Box triggers file input
+        uploadBox.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        // Avatar Local File Selection Preview
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    avatarPreview.src = evt.target.result;
+                    imagePathInput.value = evt.target.result; // Put base64 in text input for form data collection
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
