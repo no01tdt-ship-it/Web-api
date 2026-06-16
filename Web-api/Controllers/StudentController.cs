@@ -18,7 +18,7 @@ namespace Web_api.Controllers
         [HttpGet("admin/list")]
         public IActionResult Index()
         {
-            return View();
+            return View("AdminList");
         }
 
         [HttpPost("api/add")]
