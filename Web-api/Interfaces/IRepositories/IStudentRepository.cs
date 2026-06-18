@@ -1,4 +1,6 @@
 ﻿using Web_api.Models;
+using Web_api.ViewModels.Common;
+using Web_api.ViewModels.Student;
 
 namespace Web_api.Interfaces.IRepositories
 {
@@ -8,5 +10,15 @@ namespace Web_api.Interfaces.IRepositories
         Task AddAsync(Student student);
         // Hàm chính thức nhấn nút "Lưu" để đẩy dữ liệu xuống SQL Server
         Task<bool> SaveChangesAsync();
+
+        Task<List<Student>> GetAllAsync();
+        Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters);
+        Task<Student?> GetByIdAsync(int id);
+
+
+
+
+
+
     }
 }

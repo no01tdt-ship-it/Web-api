@@ -5,7 +5,7 @@ using Web_api.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register controllers with views support (before Build)
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation(); ;
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDb>(options =>
