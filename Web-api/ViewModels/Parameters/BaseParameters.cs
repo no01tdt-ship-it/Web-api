@@ -1,4 +1,4 @@
-﻿namespace Web_api.Models.Parameters
+﻿namespace Web_api.ViewModels.Parameters
 {
     public class BaseParameters
     {

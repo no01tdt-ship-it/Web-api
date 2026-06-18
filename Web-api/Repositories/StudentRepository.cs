@@ -1,6 +1,11 @@
-﻿using Web_api.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using Web_api.Data;
+using Web_api.Extensions;
 using Web_api.Interfaces.IRepositories;
 using Web_api.Models;
+using Web_api.ViewModels.Common;
+using Web_api.ViewModels.Student;
 
 namespace Web_api.Repositories
 {
@@ -23,5 +28,83 @@ namespace Web_api.Repositories
         {
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<List<Student>> GetAllAsync()
+        {
+            return await _context.Students.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<Student?> GetByIdAsync(int id){
+            return await _context.Students.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters)
+        {
+            // 1. Khởi tạo câu truy vấn gốc không theo dõi (AsNoTracking để tăng tốc độ truy vấn)
+            var query = _context.Students.AsNoTracking();
+
+            // 2. Đếm tổng số bản ghi thực tế trong DB khi chưa áp dụng lọc tìm kiếm
+            var totalRecords = await query.CountAsync();
+
+            // 3. Lọc tìm kiếm chung (Thay thế parameters.Search?.Value bằng parameters.SearchAll)
+            var searchAll = parameters.SearchText?.Trim() ?? parameters.SearchAll?.Trim() ?? "";
+            if (!string.IsNullOrEmpty(searchAll))
+            {
+                var searchLower = searchAll.ToLower();
+                query = query.Where(s =>
+                    s.Name.ToLower().Contains(searchLower) ||
+                    s.Email.ToLower().Contains(searchLower) ||
+                    s.PhoneNumber.ToLower().Contains(searchLower) ||
+                    s.Province.ToLower().Contains(searchLower) ||
+                    s.CitizenId.ToLower().Contains(searchLower) ||
+                    s.ClassName.ToLower().Contains(searchLower)
+                );
+            }
+
+            // 4. Đếm số bản ghi thỏa mãn sau khi đã tìm kiếm để DataTables phân trang chính xác
+            var filteredRecords = await query.CountAsync();
+
+            // 5. Sử dụng hàm sắp xếp động vừa viết ở Bước 1
+            var orderedQuery = query.OrderByDynamic(parameters.SortColumn, parameters.SortDirection);
+
+            // Nếu client không truyền cột để sắp xếp, mặc định sắp xếp theo Id giảm dần (học sinh mới nhất lên đầu)
+            if (string.IsNullOrWhiteSpace(parameters.SortColumn))
+            {
+                orderedQuery = query.OrderByDescending(s => s.Id);
+            }
+
+            // 6. Thực thi truy vấn kết hợp: Phân trang (Skip, Take) + Ánh xạ (Select) trực tiếp sang ViewModel
+            var listData = await orderedQuery
+                .Skip(parameters.Start)
+                .Take(parameters.Length)
+                .Select(s => new ListStudentViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    ClassName = s.ClassName,
+                    CitizenId = s.CitizenId,
+                    PhoneNumber = s.PhoneNumber,
+                    // Ánh xạ kiểu bool Gender sang string tương ứng để hiển thị
+                    GenderText = s.Gender ? "Nam" : "Nữ",
+                    Province = s.Province,
+                    Email = s.Email,
+                    IsRetained = s.IsRetained
+                })
+                .ToListAsync();
+
+            // 7. Trả về đúng định dạng hộp kết quả DTResult viết hoa theo đúng thuộc tính của Class C#
+            return new DTResult<ListStudentViewModel>
+            {
+                Draw = parameters.Draw,
+                RecordsTotal = totalRecords,
+                RecordsFiltered = filteredRecords,
+                Data = listData
+            };
+        }
+
+
+
+
+
     }
 }
