@@ -65,15 +65,17 @@ namespace Web_api.Services
             return result;
         }
 
-        public async Task<DetailStudentViewModel> GetByIdAsync(int id){
-            var s =  await _studentRepository.GetByIdAsync(id);
-            if(s == null) return null;
-            return new DetailStudentViewModel{
+        public async Task<DetailStudentViewModel> GetByIdAsync(int id)
+        {
+            var s = await _studentRepository.GetByIdAsync(id);
+            if (s == null) return null;
+            return new DetailStudentViewModel
+            {
                 Name = s.Name,
                 ClassName = s.ClassName,
                 Image = s.Image,
                 Gender = s.Gender,
-                Gender = s.Gender ? "Nam" : "Nữ",
+                GenderText = s.Gender ? "Nam" : "Nữ",
                 Email = s.Email,
                 BirthDay = s.BirthDay,
                 CitizenId = s.CitizenId,
@@ -82,8 +84,9 @@ namespace Web_api.Services
                 Ward = s.Ward,
                 Address = s.Address,
                 Course = s.Course,
-                IsRetained = s.IsRetained? "Bảo lưu" : "Đang học"
-            }
+                IsRetained = s.IsRetained,
+                IsRetainedText = s.IsRetained ? "Bảo lưu" : "Đang học"
+            };
 
         }
 
