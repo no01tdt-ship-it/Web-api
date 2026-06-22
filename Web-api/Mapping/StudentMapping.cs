@@ -1,31 +1,85 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Identity.Client;
 using Web_api.Models;
 
 namespace Web_api.Mapping
 {
     public class StudentMapping : IEntityTypeConfiguration<Student>
     {
-        public void Configure(EntityTypeBuilder<Student> builder)
+        public void Configure(EntityTypeBuilder<Student> entity)
         {
-           builder.ToTable("Students");
-            builder.HasKey(s => s.Id);
-            builder.Property(s => s.Id).UseIdentityColumn(seed:1001, increment:1);
-            builder.Property(s => s.Name).IsRequired().HasMaxLength(100);
-            builder.Property(s => s.ClassName).IsRequired().HasMaxLength(50);
-            builder.Property(s => s.Image).HasMaxLength(100);
-            builder.Property(s => s.Gender).IsRequired().HasDefaultValue(true);
-            builder.Property(s => s.Email).HasMaxLength(50);
-            builder.Property(s => s.BirthDay).IsRequired().HasColumnType("date");
-            builder.Property(s => s.CreatedDate).HasDefaultValueSql("GETDATE()");
-            builder.Property(s => s.CitizenId).IsRequired().HasMaxLength(12);
-            builder.Property(s => s.PhoneNumber).IsRequired().HasMaxLength(12);
-            builder.Property(s => s.Province).IsRequired().HasMaxLength(50);
-            builder.Property(s => s.Ward).IsRequired().HasMaxLength(50);
-            builder.Property(s => s.Address).HasMaxLength(100);
-            builder.Property(s => s.Course).HasMaxLength(50);
-            builder.Property(s => s.IsRetained).HasDefaultValue(false);
+            entity.ToTable("Student");
+
+            entity.HasKey(s => s.Id);
+
+            entity.Property(s => s.Id)
+                   .ValueGeneratedOnAdd()
+                   .UseIdentityColumn(seed: 1001, increment: 1)
+                   .HasComment("Mã học sinh");
+
+            entity.Property(s => s.Name)
+                   .IsRequired()
+                   .HasMaxLength(50)
+                   .HasComment("Họ và tên học sinh");
+
+            entity.Property(s => s.ClassName)
+                   .IsRequired()
+                   .HasMaxLength(50)
+                   .HasComment("Tên lớp");
+
+            entity.Property(s => s.Image)
+                   .HasMaxLength(250)
+                   .HasComment("Ảnh đại diện");
+
+            entity.Property(s => s.Gender)
+                   .IsRequired(false)
+                   .HasDefaultValue(true)
+                   .HasComment("Giới tính (True: Nam, False: Nữ)");
+
+            entity.Property(s => s.Email)
+                   .HasMaxLength(50)
+                   .HasComment("Địa chỉ email");
+
+            entity.Property(s => s.BirthDay)
+                   .IsRequired()
+                   .HasColumnType("date")
+                   .HasComment("Ngày sinh");
+
+            entity.Property(s => s.CreatedDate)
+                   .HasDefaultValueSql("GETDATE()")
+                   .HasColumnType("datetime")
+                   .HasComment("Ngày tạo hồ sơ");
+
+            entity.Property(s => s.CitizenId)
+                   .IsRequired()
+                   .HasMaxLength(12)
+                   .HasComment("Số căn cước công dân");
+
+            entity.Property(s => s.PhoneNumber)
+                   .IsRequired()
+                   .HasMaxLength(12)
+                   .HasComment("Số điện thoại liên hệ");
+
+            entity.Property(s => s.Province)
+                   .IsRequired()
+                   .HasMaxLength(50)
+                   .HasComment("Tỉnh/Thành phố");
+
+            entity.Property(s => s.Ward)
+                   .HasMaxLength(50)
+                   .HasComment("Phường/Xã");
+
+            entity.Property(s => s.Address)
+                   .HasMaxLength(100)
+                   .HasComment("Địa chỉ chi tiết");
+
+            entity.Property(s => s.Course)
+                   .HasMaxLength(50)
+                   .HasComment("Khóa học");
+
+            entity.Property(s => s.IsRetained)
+                   .HasDefaultValue(false)
+                   .HasComment("Trạng thái lưu ban (True: Lưu ban, False: Không lưu ban)");
         }
     }
 }
