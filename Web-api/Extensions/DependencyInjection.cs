@@ -16,6 +16,10 @@ namespace Web_api.Extensions
 
             // 2. Đăng ký nhóm Services
             services.AddScoped<IStudentService, StudentService>();
+
+
+
+            
             return services;
 
         }
