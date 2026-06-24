@@ -1,4 +1,5 @@
-﻿using Web_api.Interfaces.IRepositories;
+﻿using Web_api.Constants;
+using Web_api.Interfaces.IRepositories;
 using Web_api.Interfaces.IServices;
 using Web_api.Models;
 using Web_api.ViewModels.Common;
@@ -55,7 +56,9 @@ namespace Web_api.Services
                     Name = s.Name,
                     ClassName = s.ClassName,
                     PhoneNumber = s.PhoneNumber,
-                    GenderText = s.Gender ? "Nam" : "Nữ",
+                    GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
+                                 s.Gender == GenderConstant.Nu ? "Nữ" :
+                                 s.Gender == GenderConstant.Khac ? "Khác" : "Chưa chọn",
                     Province = s.Province,
                     Email = s.Email,
                     IsRetained = s.IsRetained
@@ -75,7 +78,9 @@ namespace Web_api.Services
                 ClassName = s.ClassName,
                 Image = s.Image,
                 Gender = s.Gender,
-                GenderText = s.Gender ? "Nam" : "Nữ",
+                GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
+                             s.Gender == GenderConstant.Nu ? "Nữ" :
+                             s.Gender == GenderConstant.Khac ? "Khác" : "Chưa chọn",
                 Email = s.Email,
                 BirthDay = s.BirthDay,
                 CitizenId = s.CitizenId,
@@ -90,5 +95,40 @@ namespace Web_api.Services
 
         }
 
+        public async Task<bool> UpdateAsync(UpdateStudentViewModel model)
+        {
+            var student = await _studentRepository.GetByIdAsync(model.Id);
+            if (student == null) return false;
+            student.Name = model.Name;
+            student.ClassName = model.ClassName;
+            student.Gender = model.Gender;
+            student.Email = model.Email;
+            student.BirthDay = model.BirthDay;
+            student.CitizenId = model.CitizenId;
+            student.PhoneNumber = model.PhoneNumber;
+            student.Province = model.Province;
+            student.Ward = model.Ward;
+            student.Address = model.Address;
+            student.Course = model.Course;
+            student.IsRetained = model.IsRetained;
+
+            if (!string.IsNullOrWhiteSpace(model.Image))
+            {
+                student.Image = model.Image;
+            }
+
+            return await _studentRepository.UpdateAsync(student);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var student = await _studentRepository.GetByIdAsync(id);
+            if (student == null)
+            {
+                throw new Exception($"Không tìm thấy học sinh mang mã số {id} để xóa!");
+            }
+
+            await _studentRepository.DeleteAsync(student);
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Web_api.Mapping
                    .HasMaxLength(50)
                    .HasComment("Họ và tên học sinh");
 
-            entity.Property(s => s.ClassName)
+            entity.Property(s => s.SchoolClass)
                    .IsRequired()
                    .HasMaxLength(50)
                    .HasComment("Tên lớp");
@@ -33,8 +33,8 @@ namespace Web_api.Mapping
 
             entity.Property(s => s.Gender)
                    .IsRequired(false)
-                   .HasDefaultValue(true)
-                   .HasComment("Giới tính (True: Nam, False: Nữ)");
+                   .HasColumnType("int")
+                   .HasComment("Giới tính (1: Nam, 2: Nữ, 3: Khác, null: Chưa chọn)");
 
             entity.Property(s => s.Email)
                    .HasMaxLength(50)
@@ -80,6 +80,11 @@ namespace Web_api.Mapping
             entity.Property(s => s.IsRetained)
                    .HasDefaultValue(false)
                    .HasComment("Trạng thái lưu ban (True: Lưu ban, False: Không lưu ban)");
+            entity.Property(s => s.Active)
+                   .HasDefaultValue(true)
+                   .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Không hoạt động)");
         }
     }
+
+
 }

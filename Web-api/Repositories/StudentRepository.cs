@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Web_api.Constants;
 using Web_api.Data;
 using Web_api.Extensions;
 using Web_api.Interfaces.IRepositories;
@@ -34,7 +35,8 @@ namespace Web_api.Repositories
             return await _context.Students.AsNoTracking().ToListAsync();
         }
 
-        public async Task<Student?> GetByIdAsync(int id){
+        public async Task<Student?> GetByIdAsync(int id)
+        {
             return await _context.Students.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
         }
 
@@ -85,7 +87,9 @@ namespace Web_api.Repositories
                     CitizenId = s.CitizenId,
                     PhoneNumber = s.PhoneNumber,
                     // Ánh xạ kiểu bool Gender sang string tương ứng để hiển thị
-                    GenderText = s.Gender ? "Nam" : "Nữ",
+                    GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
+                                 s.Gender == GenderConstant.Nu ? "Nữ" :
+                                 s.Gender == GenderConstant.Khac ? "Khác" : "Chưa chọn",
                     Province = s.Province,
                     Email = s.Email,
                     IsRetained = s.IsRetained
@@ -103,8 +107,18 @@ namespace Web_api.Repositories
         }
 
 
+        public async Task<bool> UpdateAsync(Student obj)
+        {
+            _context.Students.Update(obj);
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
-
+        public async Task DeleteAsync(Student obj)
+        {
+            _context.Students.Remove(obj);
+            await _context.SaveChangesAsync();
+        }
 
     }
 }

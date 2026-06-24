@@ -9,7 +9,7 @@ namespace Web_api.ViewModels.Student
 
         public string ClassName { get; set; }
         public string? Image { get; set; }
-        public bool Gender { get; set; }
+        public int? Gender { get; set; }
         public string GenderText { get; set; } = null;
         public string Email { get; set; }
         public DateTime BirthDay { get; set; }

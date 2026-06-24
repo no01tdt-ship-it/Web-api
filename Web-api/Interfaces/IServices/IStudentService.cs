@@ -14,5 +14,8 @@ namespace Web_api.Interfaces.IServices
 
         Task<DetailStudentViewModel> GetByIdAsync(int id);
 
+        Task<bool> UpdateAsync(UpdateStudentViewModel model);
+
+        Task DeleteAsync(int id);
     }
 }

@@ -15,8 +15,8 @@ namespace Web_api.Interfaces.IRepositories
         Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters);
         Task<Student?> GetByIdAsync(int id);
 
-
-
+        Task<bool> UpdateAsync(Student obj);
+        Task DeleteAsync(Student obj);
 
 
 

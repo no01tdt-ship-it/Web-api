@@ -2,7 +2,7 @@
 {
     public class ListStudentViewModel
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = null!;
         public string ClassName { get; set; } = null!;
         public string CitizenId { get; set; } = null!;
