@@ -4,6 +4,8 @@
     {
         public long Id { get; set; }
         public string Name { get; set; } = null!;
+        public long SchoolLevelId { get; set; }
+        public SchoolLevel SchoolLevel { get; set; } = null!;
         public string? Code { get; set; }
         public string? Province { get; set; }
         public string? Ward { get; set; }
