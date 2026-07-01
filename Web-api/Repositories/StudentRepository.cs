@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Web_api.Constants;
 using Web_api.Data;
@@ -32,12 +32,12 @@ namespace Web_api.Repositories
 
         public async Task<List<Student>> GetAllAsync()
         {
-            return await _context.Students.AsNoTracking().ToListAsync();
+            return await _context.Students.Include(s => s.SchoolClass).AsNoTracking().ToListAsync();
         }
 
-        public async Task<Student?> GetByIdAsync(int id)
+        public async Task<Student?> GetByIdAsync(long id)
         {
-            return await _context.Students.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+            return await _context.Students.Include(s => s.SchoolClass).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters)
@@ -59,7 +59,7 @@ namespace Web_api.Repositories
                     s.PhoneNumber.ToLower().Contains(searchLower) ||
                     s.Province.ToLower().Contains(searchLower) ||
                     s.CitizenId.ToLower().Contains(searchLower) ||
-                    s.ClassName.ToLower().Contains(searchLower)
+                    s.SchoolClass != null && s.SchoolClass.Name.ToLower().Contains(searchLower)
                 );
             }
 
@@ -83,7 +83,7 @@ namespace Web_api.Repositories
                 {
                     Id = s.Id,
                     Name = s.Name,
-                    ClassName = s.ClassName,
+                    ClassName = s.SchoolClass != null ? s.SchoolClass.Name : "Chưa xếp lớp",
                     CitizenId = s.CitizenId,
                     PhoneNumber = s.PhoneNumber,
                     // Ánh xạ kiểu bool Gender sang string tương ứng để hiển thị
@@ -118,6 +118,11 @@ namespace Web_api.Repositories
         {
             _context.Students.Remove(obj);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<SchoolClass?> GetClassByNameAsync(string className)
+        {
+            return await _context.Set<SchoolClass>().FirstOrDefaultAsync(c => c.Name == className);
         }
 
     }

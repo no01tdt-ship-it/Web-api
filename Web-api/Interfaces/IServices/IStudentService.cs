@@ -1,4 +1,4 @@
-﻿using Web_api.Models;
+using Web_api.Models;
 using Web_api.ViewModels.Common;
 using Web_api.ViewModels.Student;
 
@@ -12,10 +12,10 @@ namespace Web_api.Interfaces.IServices
 
         Task<List<ListStudentViewModel>> GetAllAsync();
 
-        Task<DetailStudentViewModel> GetByIdAsync(int id);
+        Task<DetailStudentViewModel> GetByIdAsync(long id);
 
         Task<bool> UpdateAsync(UpdateStudentViewModel model);
 
-        Task DeleteAsync(int id);
+        Task DeleteAsync(long id);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Web_api.Constants;
+using Web_api.Constants;
 using Web_api.Interfaces.IRepositories;
 using Web_api.Interfaces.IServices;
 using Web_api.Models;
@@ -18,10 +18,11 @@ namespace Web_api.Services
 
         public async Task<bool> CreateStudentAsync(AddStudentViewModel viewModel)
         {
+            var schoolClass = await _studentRepository.GetClassByNameAsync(viewModel.ClassName);
             var student = new Student
             {
                 Name = viewModel.Name,
-                ClassName = viewModel.ClassName,
+                SchoolClassId = schoolClass?.Id,
                 Image = viewModel.Image,
                 Gender = viewModel.Gender,
                 Email = viewModel.Email,
@@ -54,7 +55,7 @@ namespace Web_api.Services
                 {
                     Id = s.Id,
                     Name = s.Name,
-                    ClassName = s.ClassName,
+                    ClassName =  s.SchoolClass?.Name ?? "Chưa xếp lớp",
                     PhoneNumber = s.PhoneNumber,
                     GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
                                  s.Gender == GenderConstant.Nu ? "Nữ" :
@@ -68,14 +69,14 @@ namespace Web_api.Services
             return result;
         }
 
-        public async Task<DetailStudentViewModel> GetByIdAsync(int id)
+        public async Task<DetailStudentViewModel> GetByIdAsync(long id)
         {
             var s = await _studentRepository.GetByIdAsync(id);
             if (s == null) return null;
             return new DetailStudentViewModel
             {
                 Name = s.Name,
-                ClassName = s.ClassName,
+                ClassName = s.SchoolClass?.Name ?? "Chưa xếp lớp",
                 Image = s.Image,
                 Gender = s.Gender,
                 GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
@@ -99,8 +100,10 @@ namespace Web_api.Services
         {
             var student = await _studentRepository.GetByIdAsync(model.Id);
             if (student == null) return false;
+            var schoolClass = await _studentRepository.GetClassByNameAsync(model.ClassName);
+
             student.Name = model.Name;
-            student.ClassName = model.ClassName;
+            student.SchoolClassId = schoolClass?.Id;
             student.Gender = model.Gender;
             student.Email = model.Email;
             student.BirthDay = model.BirthDay;
@@ -120,7 +123,7 @@ namespace Web_api.Services
             return await _studentRepository.UpdateAsync(student);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(long id)
         {
             var student = await _studentRepository.GetByIdAsync(id);
             if (student == null)

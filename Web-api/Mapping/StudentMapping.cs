@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Web_api.Models;
 
@@ -21,11 +21,6 @@ namespace Web_api.Mapping
                    .IsRequired()
                    .HasMaxLength(50)
                    .HasComment("Họ và tên học sinh");
-
-            entity.Property(s => s.SchoolClass)
-                   .IsRequired()
-                   .HasMaxLength(50)
-                   .HasComment("Tên lớp");
 
             entity.Property(s => s.Image)
                    .HasMaxLength(250)

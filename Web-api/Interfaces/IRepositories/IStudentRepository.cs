@@ -1,4 +1,4 @@
-﻿using Web_api.Models;
+using Web_api.Models;
 using Web_api.ViewModels.Common;
 using Web_api.ViewModels.Student;
 
@@ -13,10 +13,11 @@ namespace Web_api.Interfaces.IRepositories
 
         Task<List<Student>> GetAllAsync();
         Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters);
-        Task<Student?> GetByIdAsync(int id);
+        Task<Student?> GetByIdAsync(long id);
 
         Task<bool> UpdateAsync(Student obj);
         Task DeleteAsync(Student obj);
+        Task<SchoolClass?> GetClassByNameAsync(string className);
 
 
 
