@@ -5,6 +5,7 @@
         public long Id { get; set; }
         public string Name { get; set; }
         public int? Grade { get; set; }
+        public string? Code { get; set; }
         public long SchoolId { get; set; }
         public School School { get; set; }
         public bool Active { get; set; } = true;

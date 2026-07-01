@@ -8,7 +8,7 @@ namespace Web_api.Mapping
     {
         public void Configure(EntityTypeBuilder<SchoolLevel> entity)
         {
-            entity.ToTable("SchoolLevel");
+            entity.ToTable("SchoolLevels");
 
             entity.HasKey(s => s.Id);
 

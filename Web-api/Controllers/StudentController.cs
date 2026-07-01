@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Web_api.Interfaces.IServices;
 using Web_api.ViewModels.Student;
@@ -75,7 +75,7 @@ namespace Web_api.Controllers
         }
 
         [HttpGet("api/detail/{id}")]
-        public async Task<IActionResult> GetByIdAync(int id)
+        public async Task<IActionResult> GetByIdAync(long id)
         {
             try
             {
@@ -119,7 +119,7 @@ namespace Web_api.Controllers
         }
 
         [HttpDelete("api/delete/{id}")]
-        public async Task<IActionResult> DeleteStudent(int id)
+        public async Task<IActionResult> DeleteStudent(long id)
         {
             try
             {

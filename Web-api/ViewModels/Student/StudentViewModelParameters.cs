@@ -1,4 +1,4 @@
-﻿using Web_api.ViewModels.Parameters;
+using Web_api.ViewModels.Parameters;
 
 namespace Web_api.ViewModels.Student
 {
@@ -9,8 +9,6 @@ namespace Web_api.ViewModels.Student
 
         // 2. Bộ tham số bắt buộc phải có để JQuery DataTables vận hành Server-side
         public int Draw { get; set; }   // Số thứ tự request để đồng bộ phía giao diện
-        public int Start { get; set; }  // Dòng dòng bắt đầu lấy (Ví dụ: dòng 0, dòng 10, dòng 20...)
-        public int Length { get; set; } // Số lượng dòng muốn lấy trên 1 trang (Ví dụ: 10, 25, 50 dòng)
 
         // 3. Bộ tham số phục vụ việc Click vào đầu cột để Sắp xếp (Sorting) giống công ty
         public string? SortColumn { get; set; }    // Tên cột muốn sắp xếp (Ví dụ: "Name", "ClassName")
