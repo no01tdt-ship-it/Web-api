@@ -8,11 +8,12 @@ namespace Web_api.Mapping
     {
         public void Configure(EntityTypeBuilder<SchoolClass> entity)
         {
-            entity.ToTable("SchoolClasses");
+            entity.ToTable("SchoolClass");
 
             entity.HasKey(s => s.Id);
 
             entity.Property(s => s.Id)
+                .UseIdentityColumn(seed: 1001, increment: 1)
                 .ValueGeneratedOnAdd()
                 .HasComment("Mã lớp học");
             entity.Property(s => s.Name)
@@ -20,10 +21,12 @@ namespace Web_api.Mapping
                 .HasComment("Tên lớp");
             entity.Property(s => s.Grade)
                 .IsRequired(false)
-                .HasComment("Tên cấp");
+                .HasComment("Khối lớp");
             entity.Property(s => s.Code)
                 .HasMaxLength(50)
-                .HasComment("Mã lớp");
+                .HasComment("Mã định danh lớp");
+            entity.HasIndex(s => s.Code)
+                .IsUnique();
             entity.Property(s => s.Active)
                 .HasDefaultValue(true);
 

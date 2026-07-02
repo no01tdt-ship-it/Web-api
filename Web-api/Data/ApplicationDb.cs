@@ -11,13 +11,21 @@ namespace Web_api.Data
         }
 
         public virtual DbSet<Student> Students { get; set; }
+        public virtual DbSet<School> Schools { get; set; }
+        public virtual DbSet<SchoolClass> SchoolClasses { get; set; }
+        public virtual DbSet<SchoolLevel> SchoolLevels { get; set; }
+        public virtual DbSet<Province> Provinces { get; set; }
+        public virtual DbSet<Ward> Wards { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.ApplyConfiguration(new StudentMapping());
             modelBuilder.ApplyConfiguration(new SchoolClassMapping());
             modelBuilder.ApplyConfiguration(new SchoolMapping());
             modelBuilder.ApplyConfiguration(new SchoolLevelMapping());
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new ProvinceMapping());
+            modelBuilder.ApplyConfiguration(new WardMapping());
         }
 
 

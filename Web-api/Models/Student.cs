@@ -12,13 +12,17 @@
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public string CitizenId { get; set; }
         public string PhoneNumber { get; set; }
-        public string Province { get; set; }
-        public string Ward { get; set; }
+
         public string Address { get; set; }
         public string Course { get; set; }
         public bool IsRetained { get; set; }
         public bool Active { get; set; } = true;
 
+        public long? ProvinceId { get; set; }
+        public long? WardId { get; set; }
+
+        public virtual Province? Province { get; set; }
+        public virtual Ward? Ward { get; set; }
         public SchoolClass? SchoolClass { get; set; }
     }
 }

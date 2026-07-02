@@ -8,8 +8,7 @@ namespace Web_api.ViewModels.Student
         [MaxLength(100, ErrorMessage = "Họ và tên không được vượt quá 100 ký tự.")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Tên lớp không được để trống.")]
-        [MaxLength(50, ErrorMessage = "Tên lớp không được vượt quá 50 ký tự.")]
-        public string ClassName { get; set; }
+        public long SchoolClassId { get; set; }
         [MaxLength(250, ErrorMessage = "Ảnh không được vượt quá 250 ký tự.")]
         public string? Image { get; set; }
         [Required(ErrorMessage = "Giới tính không được để trống.")]
@@ -29,10 +28,9 @@ namespace Web_api.ViewModels.Student
         [Phone(ErrorMessage = "Số điện thoại không đúng định dạng.")]
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Tỉnh không được để trống.")]
-        [StringLength(50, ErrorMessage = "Tỉnh không được vượt quá 50 ký tự.")]
-        public string Province { get; set; }
-        [StringLength(50, ErrorMessage = "Phường không được vượt quá 50 ký tự.")]
-        public string? Ward { get; set; }
+        public long ProvinceId { get; set; }
+        [Required(ErrorMessage = "Phường/Xã không được để trống.")]
+        public long WardId { get; set; }
         [StringLength(250, ErrorMessage = "Địa chỉ không được vượt quá 250 ký tự.")]
         public string? Address { get; set; }
         [StringLength(50, ErrorMessage = "Khóa học không được vượt quá 50 ký tự.")]

@@ -32,12 +32,20 @@ namespace Web_api.Repositories
 
         public async Task<List<Student>> GetAllAsync()
         {
-            return await _context.Students.Include(s => s.SchoolClass).AsNoTracking().ToListAsync();
+            return await _context.Students
+                .Include(s => s.SchoolClass)
+                .Include(s => s.Province)
+                .Include(s => s.Ward)
+                .AsNoTracking().ToListAsync();
         }
 
         public async Task<Student?> GetByIdAsync(long id)
         {
-            return await _context.Students.Include(s => s.SchoolClass).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+            return await _context.Students
+                .Include(s => s.SchoolClass)
+                .Include(s => s.Province)
+                .Include(s => s.Ward)
+                .AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters)
@@ -57,7 +65,7 @@ namespace Web_api.Repositories
                     s.Name.ToLower().Contains(searchLower) ||
                     s.Email.ToLower().Contains(searchLower) ||
                     s.PhoneNumber.ToLower().Contains(searchLower) ||
-                    s.Province.ToLower().Contains(searchLower) ||
+                    s.Province != null && s.Province.Name.ToLower().Contains(searchLower) ||
                     s.CitizenId.ToLower().Contains(searchLower) ||
                     s.SchoolClass != null && s.SchoolClass.Name.ToLower().Contains(searchLower)
                 );
@@ -90,7 +98,7 @@ namespace Web_api.Repositories
                     GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
                                  s.Gender == GenderConstant.Nu ? "Nữ" :
                                  s.Gender == GenderConstant.Khac ? "Khác" : "Chưa chọn",
-                    Province = s.Province,
+                    Province = s.Province != null ? s.Province.Name : "",
                     Email = s.Email,
                     IsRetained = s.IsRetained
                 })
@@ -120,10 +128,19 @@ namespace Web_api.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<SchoolClass?> GetClassByNameAsync(string className)
+        public async Task<SchoolClass?> GetClassByNameAsync(long Id)
         {
-            return await _context.Set<SchoolClass>().FirstOrDefaultAsync(c => c.Name == className);
+            return await _context.SchoolClasses.FirstOrDefaultAsync(c => c.Id == Id);
         }
 
+        public async Task<Province?> GetProvinceByNameAsync(long Id)
+        {
+            return await _context.Provinces.FirstOrDefaultAsync(p => p.Id == Id);
+        }
+
+        public async Task<Ward?> GetWardByNameAsync(long Id)
+        {
+            return await _context.Wards.FirstOrDefaultAsync(w => w.Id == Id);
+        }
     }
 }

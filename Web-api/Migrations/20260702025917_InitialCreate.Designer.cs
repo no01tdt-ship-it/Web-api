@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web_api.Data;
 
@@ -11,9 +12,11 @@ using Web_api.Data;
 namespace Web_api.Migrations
 {
     [DbContext(typeof(ApplicationDb))]
-    partial class ApplicationDbModelSnapshot : ModelSnapshot
+    [Migration("20260702025917_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,41 +24,6 @@ namespace Web_api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Web_api.Models.Province", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1001L);
-
-                    b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Không hoạt động)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasComment("Mã định danh tỉnh/thành phố");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasComment("Tên tỉnh/thành phố");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.ToTable("Province", (string)null);
-                });
 
             modelBuilder.Entity("Web_api.Models.School", b =>
                 {
@@ -88,16 +56,18 @@ namespace Web_api.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasComment("Tên trường học");
 
-                    b.Property<long?>("ProvinceId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố");
+                    b.Property<string>("Province")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Nhập tỉnh");
 
                     b.Property<long>("SchoolLevelId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("WardId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã phường/xã");
+                    b.Property<string>("Ward")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Nhập Xã");
 
                     b.HasKey("Id");
 
@@ -105,11 +75,7 @@ namespace Web_api.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.HasIndex("ProvinceId");
-
                     b.HasIndex("SchoolLevelId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("School", (string)null);
                 });
@@ -269,92 +235,37 @@ namespace Web_api.Migrations
                         .HasColumnType("nvarchar(12)")
                         .HasComment("Số điện thoại liên hệ");
 
-                    b.Property<long?>("ProvinceId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố");
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Tỉnh/Thành phố");
 
                     b.Property<long?>("SchoolClassId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("WardId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã phường/xã");
+                    b.Property<string>("Ward")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Phường/Xã");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProvinceId");
-
                     b.HasIndex("SchoolClassId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("Student", (string)null);
                 });
 
-            modelBuilder.Entity("Web_api.Models.Ward", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Mã phường/xã");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1001L);
-
-                    b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Không hoạt động)");
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasComment("Mã định danh phường/xã");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasComment("Tên phường/xã");
-
-                    b.Property<long>("ProvinceId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố trực thuộc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL");
-
-                    b.HasIndex("ProvinceId");
-
-                    b.ToTable("Ward", (string)null);
-                });
-
             modelBuilder.Entity("Web_api.Models.School", b =>
                 {
-                    b.HasOne("Web_api.Models.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Web_api.Models.SchoolLevel", "SchoolLevel")
                         .WithMany("Schools")
                         .HasForeignKey("SchoolLevelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Web_api.Models.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Province");
-
                     b.Navigation("SchoolLevel");
-
-                    b.Navigation("Ward");
                 });
 
             modelBuilder.Entity("Web_api.Models.SchoolClass", b =>
@@ -370,42 +281,12 @@ namespace Web_api.Migrations
 
             modelBuilder.Entity("Web_api.Models.Student", b =>
                 {
-                    b.HasOne("Web_api.Models.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Web_api.Models.SchoolClass", "SchoolClass")
                         .WithMany("Students")
                         .HasForeignKey("SchoolClassId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Web_api.Models.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Province");
-
                     b.Navigation("SchoolClass");
-
-                    b.Navigation("Ward");
-                });
-
-            modelBuilder.Entity("Web_api.Models.Ward", b =>
-                {
-                    b.HasOne("Web_api.Models.Province", "Province")
-                        .WithMany("Wards")
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Province");
-                });
-
-            modelBuilder.Entity("Web_api.Models.Province", b =>
-                {
-                    b.Navigation("Wards");
                 });
 
             modelBuilder.Entity("Web_api.Models.School", b =>

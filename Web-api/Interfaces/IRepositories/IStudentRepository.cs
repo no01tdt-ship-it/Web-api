@@ -17,7 +17,9 @@ namespace Web_api.Interfaces.IRepositories
 
         Task<bool> UpdateAsync(Student obj);
         Task DeleteAsync(Student obj);
-        Task<SchoolClass?> GetClassByNameAsync(string className);
+        Task<SchoolClass?> GetClassByIdAsync(long? Id);
+        Task<Province?> GetProvinceByIdAsync(long? Id);
+        Task<Ward?> GetWardByIdAsync(long? Id);
 
 
 
