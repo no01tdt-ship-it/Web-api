@@ -9,6 +9,8 @@
         public long SchoolId { get; set; }
         public School School { get; set; }
         public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; }
+
         public ICollection<Student> Students { get; set; } = new List<Student>();
 
 

@@ -17,5 +17,9 @@ namespace Web_api.Interfaces.IServices
         Task<bool> UpdateAsync(UpdateStudentViewModel model);
 
         Task DeleteAsync(long id);
+
+        Task<List<SchoolClass>> GetClassesAsync();
+        Task<List<Province>> GetProvincesAsync();
+        Task<List<Ward>> GetWardsByProvinceIdAsync(long provinceId);
     }
 }

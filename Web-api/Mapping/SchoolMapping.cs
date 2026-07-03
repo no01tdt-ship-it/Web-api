@@ -16,19 +16,28 @@ namespace Web_api.Mapping
                 .UseIdentityColumn(seed: 1001, increment: 1)
                 .ValueGeneratedOnAdd()
                 .HasComment("Mã trường học");
+
             entity.Property(s => s.Name)
                 .IsRequired()
                 .HasMaxLength(100)
                 .HasComment("Tên trường học");
+
             entity.Property(s => s.Code)
                 .HasMaxLength(20)
                 .HasComment("Mã định danh trường");
+
             entity.HasIndex(s => s.Code)
                 .IsUnique();
             entity.Property(s => s.ProvinceId)
                 .HasComment("Mã tỉnh/thành phố");
+
             entity.Property(s => s.WardId)
                 .HasComment("Mã phường/xã");
+
+            entity.Property(s => s.CreatedDate)
+                .HasDefaultValueSql("GETDATE()")
+                .HasColumnType("datetime")
+                .HasComment("Ngày tạo");
 
             entity.HasOne(s => s.Province)
                 .WithMany()
@@ -39,9 +48,11 @@ namespace Web_api.Mapping
                 .WithMany()
                 .HasForeignKey(s => s.WardId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             entity.Property(s => s.Address)
                 .HasMaxLength(250)
                 .HasComment("Nhập địa chỉ");
+
             entity.Property(s => s.Active)
                 .HasDefaultValue(true)
                 .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Khóa)");

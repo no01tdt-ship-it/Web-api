@@ -29,6 +29,10 @@ namespace Web_api.Mapping
 
             entity.HasIndex(s => s.Code)
                 .IsUnique();
+            entity.Property(s => s.CreatedDate)
+                .HasDefaultValueSql("GETDATE()")
+                .HasColumnType("datetime")
+                .HasComment("Ngày tạo");
 
             entity.Property(s => s.Active)
                 .HasDefaultValue(true)

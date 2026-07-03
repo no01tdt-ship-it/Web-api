@@ -16,6 +16,7 @@ namespace Web_api.Data
         public virtual DbSet<SchoolLevel> SchoolLevels { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<Ward> Wards { get; set; }
+        public virtual DbSet<AdminMenu> AdminMenus { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -26,6 +27,7 @@ namespace Web_api.Data
             modelBuilder.ApplyConfiguration(new SchoolLevelMapping());
             modelBuilder.ApplyConfiguration(new ProvinceMapping());
             modelBuilder.ApplyConfiguration(new WardMapping());
+            modelBuilder.ApplyConfiguration(new AdminMenuMapping());
         }
 
 

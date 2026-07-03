@@ -17,11 +17,11 @@ namespace Web_api.Interfaces.IRepositories
 
         Task<bool> UpdateAsync(Student obj);
         Task DeleteAsync(Student obj);
-        Task<SchoolClass?> GetClassByIdAsync(long? Id);
-        Task<Province?> GetProvinceByIdAsync(long? Id);
-        Task<Ward?> GetWardByIdAsync(long? Id);
-
-
-
+        Task<SchoolClass?> GetClassByIdAsync(long Id);
+        Task<Province?> GetProvinceByIdAsync(long Id);
+        Task<Ward?> GetWardByIdAsync(long Id);
+        Task<List<SchoolClass>> GetClassesAsync();
+        Task<List<Province>> GetProvincesAsync();
+        Task<List<Ward>> GetWardsByProvinceIdAsync(long provinceId);
     }
 }

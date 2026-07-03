@@ -30,6 +30,11 @@ namespace Web_api.Mapping
             entity.Property(s => s.Active)
                 .HasDefaultValue(true);
 
+            entity.Property(s => s.CreatedDate)
+                .HasDefaultValueSql("GETDATE()")
+                .HasColumnType("datetime")
+                .HasComment("Ngày tạo");
+
             entity.HasOne(x => x.School)
                .WithMany(x => x.SchoolClasses)
                .HasForeignKey(x => x.SchoolId)

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Web_api.ViewModels.Student
 {
@@ -21,5 +21,9 @@ namespace Web_api.ViewModels.Student
         public string? Course { get; set; }
         public bool? IsRetained { get; set; }
         public string IsRetainedText { get; set; } = null;
+
+        public long? ProvinceId { get; set; }
+        public long? WardId { get; set; }
+        public long? SchoolClassId { get; set; }
     }
 }

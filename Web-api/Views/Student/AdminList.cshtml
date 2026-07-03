@@ -339,12 +339,16 @@
 
                     <div class="form-group col-6">
                         <label class="form-label">Tỉnh / Thành phố <span style="color:var(--danger)">*</span></label>
-                        <input type="text" class="form-control" id="studentProvince" placeholder="Nhập tên thành phố">
+                        <select id="studentProvince" name="ProvinceId" class="form-control select2" required>
+                            <option value="" disabled selected hidden>Chọn Tỉnh / Thành phố</option>
+                        </select>
                     </div>
 
                     <div class="form-group col-6">
-                        <label class="form-label">Phường / Xã</label>
-                        <input type="text" class="form-control" id="studentWard" placeholder="Nhập phường xã">
+                        <label class="form-label">Phường / Xã <span style="color:var(--danger)">*</span></label>
+                        <select id="studentWard" name="WardId" class="form-control select2" required>
+                            <option value="" disabled selected hidden>Chọn Phường / Xã</option>
+                        </select>
                     </div>
 
                     <div class="form-group col-12">
@@ -362,7 +366,9 @@
 
                     <div class="form-group col-6">
                         <label class="form-label">Lớp học <span style="color:var(--danger)">*</span></label>
-                        <input type="text" class="form-control" id="studentClassName" required placeholder="Nhập lớp học">
+                        <select id="studentClass" name="SchoolClassId" class="form-control select2" required>
+                            <option value="" disabled selected hidden>Chọn lớp học</option>
+                        </select>
                     </div>
 
                     <div class="form-group col-12">
@@ -494,7 +500,8 @@
         $(document).ready(function() {
 
             initDatePicker();
-            initGenderSelect();
+            initSelect2Elements();
+            loadProvincesAndClasses();
             initTable();
             initSearchEvent();
 
@@ -512,13 +519,90 @@
             });
         }
 
-        // Initialize Select2 Dropdown
-        function initGenderSelect(){
+        // Initialize Select2 Dropdowns
+        function initSelect2Elements(){
             $('#studentGender').select2({
                 placeholder: "Chọn giới tính",
                 minimumResultsForSearch: -1,
                 width: '100%',
                 dropdownParent: $('#studentModal')
+            });
+            $('#studentProvince').select2({
+                placeholder: "Chọn Tỉnh / Thành phố",
+                width: '100%',
+                dropdownParent: $('#studentModal')
+            });
+            $('#studentWard').select2({
+                placeholder: "Chọn Phường / Xã",
+                width: '100%',
+                dropdownParent: $('#studentModal')
+            });
+            $('#studentClass').select2({
+                placeholder: "Chọn lớp học",
+                width: '100%',
+                dropdownParent: $('#studentModal')
+            });
+
+            // Bind change event to load wards when province is selected
+            $('#studentProvince').on('change', function() {
+                const provinceId = $(this).val();
+                loadWards(provinceId);
+            });
+        }
+
+        function loadProvincesAndClasses() {
+            // Load provinces
+            $.ajax({
+                url: "/student/api/provinces",
+                type: "GET",
+                success: function (provinces) {
+                    const provinceSelect = $('#studentProvince');
+                    provinces.forEach(function (p) {
+                        provinceSelect.append(new Option(p.name, p.id));
+                    });
+                }
+            });
+
+            // Load classes
+            $.ajax({
+                url: "/student/api/classes",
+                type: "GET",
+                success: function (classes) {
+                    const classSelect = $('#studentClass');
+                    const filterClassSelect = $('#filterClass');
+                    classes.forEach(function (c) {
+                        classSelect.append(new Option(c.name, c.id));
+                        filterClassSelect.append(new Option(c.name, c.id));
+                    });
+                }
+            });
+        }
+
+        function loadWards(provinceId, selectedWardId = null) {
+            const wardSelect = $('#studentWard');
+            wardSelect.empty().append('<option value="" disabled selected hidden>Chọn Phường / Xã</option>');
+            
+            if (!provinceId) {
+                wardSelect.trigger('change');
+                return;
+            }
+
+            return $.ajax({
+                url: `/student/api/wards/${provinceId}`,
+                type: "GET",
+                success: function (wards) {
+                    wards.forEach(function (w) {
+                        const option = new Option(w.name, w.id, false, w.id == selectedWardId);
+                        wardSelect.append(option);
+                    });
+                    if (selectedWardId) {
+                        wardSelect.val(selectedWardId);
+                    }
+                    wardSelect.trigger('change');
+                },
+                error: function (xhr) {
+                    console.error("Không thể tải danh sách xã/phường", xhr);
+                }
             });
         }
 
@@ -785,15 +869,15 @@
             var formData = {
                 Id: isUpdate ? Number(studentIdRaw) : 0,
                 Name: $("#studentName").val().trim(),
-                ClassName: $("#studentClassName").val().trim(),
+                SchoolClassId: $("#studentClass").val() ? Number($("#studentClass").val()) : 0,
                 Image: $("#imagePath").val() ? $("#imagePath").val().trim() : "default-avatar.png", // Lấy đường dẫn ảnh
                 Gender: $("#studentGender").val() ? Number($("#studentGender").val()) : null,
                 Email: $("#studentEmail").val().trim(),
                 BirthDay: birthDayISO, // Gửi định dạng YYYY-MM-DD
                 CitizenId: $("#studentCitizenId").val().trim(),
                 PhoneNumber: $("#studentPhone").val().trim(),
-                Province: $("#studentProvince").val().trim(),
-                Ward: $("#studentWard").val().trim(),
+                ProvinceId: $("#studentProvince").val() ? Number($("#studentProvince").val()) : 0,
+                WardId: $("#studentWard").val() ? Number($("#studentWard").val()) : 0,
                 Address: $("#studentAddress").val().trim(),
                 Course: $("#studentCourse").val().trim(),
                 IsRetained: $("#studentIsRetained").is(":checked")
@@ -870,8 +954,9 @@
                 "#studentPhone",
                 "#studentEmail",
                 "#studentCourse",
-                "#studentClassName",
-                "#studentProvince"
+                "#studentClass",
+                "#studentProvince",
+                "#studentWard"
             ];
 
             requiredFields.forEach(function(selector){
@@ -990,6 +1075,9 @@
         function openAddModal() {
             studentForm.reset();
             $('#studentGender').val(null).trigger('change');
+            $('#studentProvince').val(null).trigger('change');
+            $('#studentWard').empty().append('<option value="" disabled selected hidden>Chọn Phường / Xã</option>').val(null).trigger('change');
+            $('#studentClass').val(null).trigger('change');
             document.getElementById('studentId').value = '';
             document.getElementById('modalTitle').textContent = 'Thêm Mới Học Sinh';
             document.getElementById('btnSubmitModal').textContent = 'Lưu thông tin';
@@ -1025,11 +1113,22 @@ function editItem(studentId) {
                 $("#studentCitizenId").val(res.citizenId);
                 $("#studentPhone").val(res.phoneNumber);
                 $("#studentEmail").val(res.email);
-                $("#studentProvince").val(res.province);
-                $("#studentWard").val(res.ward);
                 $("#studentAddress").val(res.address);
                 $("#studentCourse").val(res.course);
-                $("#studentClassName").val(res.className);
+                
+                // Điền Tỉnh/Thành phố và Xã/Phường
+                if (res.provinceId) {
+                    $("#studentProvince").val(res.provinceId).trigger('change', [res.wardId]);
+                } else {
+                    $("#studentProvince").val(null).trigger('change');
+                }
+
+                // Điền Lớp học
+                if (res.schoolClassId) {
+                    $("#studentClass").val(res.schoolClassId).trigger('change');
+                } else {
+                    $("#studentClass").val(null).trigger('change');
+                }
                 
                 // Điền trạng thái Bảo lưu (Checkbox)
                 $("#studentIsRetained").prop("checked", res.isRetained);

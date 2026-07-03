@@ -37,6 +37,11 @@ namespace Web_api.Mapping
                 .HasDefaultValue(true)
                 .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Không hoạt động)");
 
+            entity.Property(s => s.CreatedDate)
+                .HasDefaultValueSql("GETDATE()")
+                .HasColumnType("datetime")
+                .HasComment("Ngày tạo");
+
             entity.HasOne(x => x.Province)
                 .WithMany(x => x.Wards)
                 .HasForeignKey(x => x.ProvinceId)

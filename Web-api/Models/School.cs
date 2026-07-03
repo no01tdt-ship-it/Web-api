@@ -12,6 +12,8 @@ namespace Web_api.Models
         public virtual Province? Province { get; set; }
         public virtual Ward? Ward { get; set; }
         public string? Address { get; set; }
+        public DateTime CreatedDate { get; set; }
+
         public bool Active { get; set; } = true;
         public ICollection<SchoolClass> SchoolClasses { get; set; } = new List<SchoolClass>();
     }
