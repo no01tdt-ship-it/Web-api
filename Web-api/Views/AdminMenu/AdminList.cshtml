@@ -1,0 +1,809 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Thiết Kế Menu Hệ Thống - Admin";
+}
+
+<style>
+    /* Bố cục chia cột: Cột 1 xem trước Sidebar, Cột 2 là Form điền dữ liệu */
+    .menu-editor-layout {
+        display: grid;
+        grid-template-columns: 320px 1fr; /* 320px sidebar preview, rest is form */
+        gap: 30px;
+        align-items: start;
+        margin-top: 15px;
+    }
+
+    @@media (max-width: 992px) {
+        .menu-editor-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .menu-preview-panel, .menu-form-panel {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glass);
+        padding: 24px;
+        backdrop-filter: blur(8px);
+    }
+
+    .panel-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .panel-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    /* Phong cách Mockup Sidebar Xem trước */
+    .mockup-sidebar {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        min-height: 450px;
+    }
+
+    .mockup-brand {
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid var(--border);
+        background-color: #f8fafc;
+    }
+
+    .mockup-brand i {
+        font-size: 20px;
+        color: var(--primary);
+    }
+
+    .mockup-brand span {
+        font-size: 15px;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .mockup-menu-wrapper {
+        padding: 12px 8px;
+    }
+
+    .mockup-menu {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .mockup-menu-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mockup-link-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-radius: var(--radius-md);
+        transition: var(--transition);
+        position: relative;
+        cursor: pointer;
+    }
+
+    .mockup-link-container:hover {
+        background-color: var(--bg-main);
+    }
+
+    .mockup-menu-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-main);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        width: 70%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mockup-menu-link i {
+        width: 16px;
+        font-size: 14px;
+        color: var(--primary);
+        text-align: center;
+    }
+
+    /* Actions overlay hiển thị khi hover chuột vào menu */
+    .mockup-actions {
+        display: none;
+        gap: 3px;
+        position: absolute;
+        right: 6px;
+        background-color: var(--bg-card);
+        padding: 2px;
+        border-radius: 6px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+        z-index: 10;
+    }
+
+    .mockup-link-container:hover .mockup-actions,
+    .mockup-submenu-item:hover .mockup-actions {
+        display: flex;
+    }
+
+    .mockup-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 10px;
+        transition: var(--transition);
+    }
+
+    .mockup-btn-edit {
+        background-color: var(--warning-light);
+        color: var(--warning);
+    }
+    .mockup-btn-edit:hover {
+        background-color: var(--warning);
+        color: white;
+    }
+
+    .mockup-btn-delete {
+        background-color: var(--danger-light);
+        color: var(--danger);
+    }
+    .mockup-btn-delete:hover {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    .mockup-btn-add {
+        background-color: var(--primary-light);
+        color: var(--primary);
+    }
+    .mockup-btn-add:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    /* Mockup Submenu */
+    .mockup-submenu {
+        list-style: none;
+        padding-left: 20px;
+        margin: 2px 0 6px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        border-left: 1px dashed var(--border);
+    }
+
+    .mockup-submenu-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        position: relative;
+        cursor: pointer;
+    }
+
+    .mockup-submenu-item:hover {
+        background-color: var(--bg-main);
+    }
+
+    .mockup-submenu-link {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        width: 70%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mockup-submenu-link i {
+        font-size: 12px;
+        color: var(--accent);
+    }
+
+    .menu-arrow {
+        font-size: 10px;
+        transition: transform 0.2s ease;
+        color: var(--text-muted);
+    }
+
+    .mockup-link-container.collapsed .menu-arrow {
+        transform: rotate(-90deg);
+    }
+
+    .form-checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-top: 10px;
+    }
+
+    .form-checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary);
+    }
+
+    .form-checkbox-group label {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <header class="header-section">
+        <div class="header-info">
+            <h1>Cấu Hình Thiết Kế Sidebar Menu</h1>
+            <p>Xem trước trực tiếp cấu trúc hiển thị sidebar bên ngoài. Nhấp để chỉnh sửa hoặc thêm menu mới.</p>
+        </div>
+    </header>
+
+    <!-- Stats Grid Widgets -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Tổng số menu</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value" id="statActive">0</div>
+                <div class="stat-label">Menu hoạt động</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value" id="statSystem">0</div>
+                <div class="stat-label">Menu hệ thống</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Layout -->
+    <div class="menu-editor-layout">
+        <!-- Bảng Xem Trước Sidebar (Bên trái) -->
+        <div class="menu-preview-panel">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-folder-tree"></i> Sidebar Xem Trước</h3>
+            </div>
+            <div class="mockup-sidebar">
+                <div class="mockup-brand">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Portal Admin</span>
+                </div>
+                <div class="mockup-menu-wrapper">
+                    <ul class="mockup-menu" id="mockupMenuContainer">
+                        <!-- Nạp động từ javascript -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Thiết Kế Nhập Liệu (Bên phải) -->
+        <div class="menu-form-panel">
+            <div class="panel-header">
+                <h3 id="formTitle"><i class="fa-solid fa-pen-to-square"></i> Thêm Mới Menu</h3>
+                <button type="button" class="btn btn-secondary" id="btnCancelEdit" style="display: none; padding: 6px 12px; font-size: 12px;" onclick="resetFormToCreate()">
+                    <i class="fa-solid fa-xmark"></i> Hủy sửa
+                </button>
+            </div>
+
+            <form id="menuForm" novalidate>
+                <input type="hidden" id="menuId" name="Id">
+                <div class="form-grid">
+                    <!-- Tên Menu -->
+                    <div class="form-group col-6">
+                        <label class="form-label" for="menuName">Tên Menu <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="menuName" name="MenuName" required placeholder="Nhập tên hiển thị của menu">
+                        <span class="field-error" id="errorMenuName"></span>
+                    </div>
+
+                    <!-- Mã Menu (MenuCode) -->
+                    <div class="form-group col-6">
+                        <label class="form-label" for="menuCode">Mã Menu (Tự động sinh)</label>
+                        <input type="text" class="form-control" id="menuCode" name="MenuCode" readonly placeholder="Mã menu sẽ tự động sinh...">
+                        <span class="field-error" id="errorMenuCode"></span>
+                    </div>
+
+                    <!-- Menu Cha -->
+                    <div class="form-group col-6">
+                        <label class="form-label" for="parentId">Menu Cấp Trên (Cha)</label>
+                        <select class="filter-select" id="parentId" name="ParentId">
+                            <option value="">-- Chọn làm Menu Gốc (Không có cha) --</option>
+                        </select>
+                        <span class="field-error" id="errorParentId"></span>
+                    </div>
+
+                    <!-- Đường Dẫn Url -->
+                    <div class="form-group col-6">
+                        <label class="form-label" for="menuUrl">Đường Dẫn (Url)</label>
+                        <input type="text" class="form-control" id="menuUrl" name="Url" placeholder="Ví dụ: /student/admin/list">
+                        <span class="field-error" id="errorUrl"></span>
+                    </div>
+
+                    <!-- Icon -->
+                    <div class="form-group col-6">
+                        <label class="form-label" for="menuIcon">Icon (CSS class)</label>
+                        <input type="text" class="form-control" id="menuIcon" name="Icon" placeholder="Ví dụ: fa-solid fa-user">
+                        <span class="field-error" id="errorIcon"></span>
+                    </div>
+
+                    <!-- Thứ tự sắp xếp -->
+                    <div class="form-group col-4">
+                        <label class="form-label" for="sortOrder">Thứ Tự Sắp Xếp <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="sortOrder" name="SortOrder" required value="0">
+                        <span class="field-error" id="errorSortOrder"></span>
+                    </div>
+
+                    <!-- Menu hệ thống -->
+                    <div class="form-group col-4">
+                        <div class="form-checkbox-group">
+                            <input type="checkbox" id="isSystem" name="IsSystem">
+                            <label for="isSystem">Menu Hệ Thống</label>
+                        </div>
+                    </div>
+
+                    <!-- Trạng thái hoạt động -->
+                    <div class="form-group col-4">
+                        <div class="form-checkbox-group">
+                            <input type="checkbox" id="active" name="Active" checked>
+                            <label for="active">Kích Hoạt Hoạt Động</label>
+                        </div>
+                    </div>
+
+                    <!-- Mô tả -->
+                    <div class="form-group col-12">
+                        <label class="form-label" for="description">Mô Tả</label>
+                        <textarea class="form-control" id="description" name="Description" rows="3" style="resize: vertical; height: auto;" placeholder="Mô tả công dụng hoặc phân quyền của menu"></textarea>
+                        <span class="field-error" id="errorDescription"></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-secondary" onclick="resetFormToCreate()">Hủy Bỏ / Reset</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">Lưu Thông Tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const menuForm = document.getElementById('menuForm');
+        var allMenus = [];
+
+        $(document).ready(function() {
+            initSelect2();
+            loadParentMenus();
+            loadSidebarMockup();
+
+            // Tự động sinh mã menuCode khi người dùng nhập tên menu
+            $('#menuName').on('input', function() {
+                const code = generateMenuCodeJs($(this).val());
+                $('#menuCode').val(code);
+            });
+        });
+
+        // Khởi tạo Select2
+        function initSelect2() {
+            $('#parentId').select2({
+                placeholder: "Chọn Menu Cấp Trên",
+                width: '100%'
+            });
+        }
+
+        // Tải danh sách menu cha đổ vào dropdown
+        function loadParentMenus(selectedParentId = null) {
+            $.ajax({
+                url: "/adminmenu/api/parent-menus",
+                type: "GET",
+                success: function(parents) {
+                    const select = $('#parentId');
+                    select.empty().append('<option value="">-- Chọn làm Menu Gốc (Không có cha) --</option>');
+                    parents.forEach(function(p) {
+                        select.append(new Option(p.name, p.id));
+                    });
+                    if (selectedParentId) {
+                        select.val(selectedParentId).trigger('change');
+                    } else {
+                        select.val("").trigger('change');
+                    }
+                }
+            });
+        }
+
+        // Tải danh sách menu và cập nhật sidebar mockup
+        function loadSidebarMockup() {
+            $.ajax({
+                url: "/adminmenu/api/list",
+                type: "GET",
+                success: function(data) {
+                    allMenus = data;
+                    renderMockupSidebar();
+                    updateStats(data);
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thất bại',
+                        text: 'Không thể kết nối API tải danh sách menu!'
+                    });
+                }
+            });
+        }
+
+        // Dựng HTML thanh sidebar xem trước (mockup)
+        function renderMockupSidebar() {
+            const container = $('#mockupMenuContainer');
+            container.empty();
+
+            if (!allMenus || allMenus.length === 0) {
+                container.append('<li class="text-center text-muted py-5" style="font-size:12px;">Chưa có mục menu nào. Hãy tạo ở form bên phải!</li>');
+                return;
+            }
+
+            // Lọc các menu cha gốc
+            const parents = allMenus.filter(m => m.parentId === null).sort((a, b) => a.sortOrder - b.sortOrder);
+
+            parents.forEach(parent => {
+                const children = allMenus.filter(m => m.parentId === parent.id).sort((a, b) => a.sortOrder - b.sortOrder);
+                const hasChildren = children.length > 0;
+
+                let parentHtml = `
+                    <li class="mockup-menu-item">
+                        <div class="mockup-link-container ${hasChildren ? "" : "collapsed"}">
+                            <div class="mockup-menu-link">
+                                <i class="${parent.icon || 'fa-solid fa-link'}"></i>
+                                <span>${parent.menuName}</span>
+                            </div>
+                            
+                            <!-- Nhóm hành động ẩn hiện khi hover -->
+                            <div class="mockup-actions">
+                                ${hasChildren ? '' : `<button type="button" class="mockup-btn mockup-btn-add" onclick="addChildMenu(${parent.id})" title="Thêm con"><i class="fa-solid fa-plus"></i></button>`}
+                                <button type="button" class="mockup-btn mockup-btn-edit" onclick="openEditMode(${parent.id})" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" class="mockup-btn mockup-btn-delete" onclick="deleteMenu(${parent.id}, ${parent.isSystem})" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                            
+                            ${hasChildren ? '<i class="fa-solid fa-chevron-down menu-arrow"></i>' : ''}
+                        </div>
+                `;
+
+                if (hasChildren) {
+                    parentHtml += `<ul class="mockup-submenu">`;
+                    children.forEach(child => {
+                        parentHtml += `
+                            <li class="mockup-submenu-item">
+                                <div class="mockup-submenu-link">
+                                    <i class="${child.icon || 'fa-solid fa-circle-dot'}"></i>
+                                    <span>${child.menuName}</span>
+                                </div>
+                                
+                                <div class="mockup-actions">
+                                    <button type="button" class="mockup-btn mockup-btn-edit" onclick="openEditMode(${child.id})" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                                    <button type="button" class="mockup-btn mockup-btn-delete" onclick="deleteMenu(${child.id}, ${child.isSystem})" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </li>
+                        `;
+                    });
+                    parentHtml += `</ul>`;
+                }
+
+                parentHtml += `</li>`;
+                container.append(parentHtml);
+            });
+        }
+
+        // Cập nhật số liệu thống kê
+        function updateStats(data) {
+            $('#statTotal').text(data.length);
+            $('#statActive').text(data.filter(m => m.active).length);
+            $('#statSystem').text(data.filter(m => m.isSystem).length);
+        }
+
+        // Thiết lập nhanh khi click "Thêm menu con"
+        function addChildMenu(parentId) {
+            resetFormToCreate();
+            loadParentMenus(parentId);
+            $('#menuName').focus();
+        }
+
+        // Kích hoạt chế độ chỉnh sửa sửa đổi
+        function openEditMode(id) {
+            clearErrors();
+            $.ajax({
+                url: `/adminmenu/api/detail/${id}`,
+                type: "GET",
+                success: function(menu) {
+                    $('#menuId').val(menu.id);
+                    $('#menuName').val(menu.menuName);
+                    $('#menuCode').val(menu.menuCode);
+                    $('#menuUrl').val(menu.url || '');
+                    $('#menuIcon').val(menu.icon || '');
+                    $('#sortOrder').val(menu.sortOrder);
+                    $('#isSystem').prop('checked', menu.isSystem);
+                    $('#active').prop('checked', menu.active);
+                    $('#description').val(menu.description || '');
+
+                    $('#formTitle').html('<i class="fa-solid fa-pen-to-square"></i> Cập Nhật Menu: <span class="text-primary">' + menu.menuName + '</span>');
+                    $('#btnCancelEdit').show();
+                    
+                    loadParentMenus(menu.parentId);
+                    // Cuộn trang nhẹ nhàng sang form
+                    $('.menu-form-panel')[0].scrollIntoView({ behavior: 'smooth' });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thất bại',
+                        text: 'Không thể tải thông tin chi tiết menu để cập nhật!'
+                    });
+                }
+            });
+        }
+
+        // Reset biểu mẫu về mặc định (Chế độ thêm mới)
+        function resetFormToCreate() {
+            clearErrors();
+            menuForm.reset();
+            $('#menuId').val('');
+            $('#formTitle').html('<i class="fa-solid fa-pen-to-square"></i> Thêm Mới Menu');
+            $('#btnCancelEdit').hide();
+            
+            // Checkbox mặc định
+            $('#isSystem').prop('checked', false);
+            $('#active').prop('checked', true);
+
+            loadParentMenus();
+        }
+
+        // Xử lý gửi Form (Thêm / Sửa)
+        menuForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearErrors();
+
+            let isValid = true;
+            const menuName = $('#menuName').val().trim();
+            const sortOrder = $('#sortOrder').val().trim();
+
+            if (!menuName) {
+                showError('MenuName', 'Tên menu không được để trống.');
+                isValid = false;
+            }
+            if (sortOrder === "") {
+                showError('SortOrder', 'Thứ tự sắp xếp không được để trống.');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const id = $('#menuId').val();
+            const parentId = $('#parentId').val();
+
+            const payload = {
+                ParentId: parentId ? parseInt(parentId) : null,
+                MenuCode: $('#menuCode').val().trim() || null,
+                MenuName: menuName,
+                Url: $('#menuUrl').val().trim() || null,
+                Icon: $('#menuIcon').val().trim() || null,
+                SortOrder: parseInt(sortOrder),
+                IsSystem: $('#isSystem').is(':checked'),
+                Active: $('#active').is(':checked'),
+                Description: $('#description').val().trim() || null
+            };
+
+            let ajaxUrl = "/adminmenu/api/add";
+            let ajaxMethod = "POST";
+
+            if (id) {
+                payload.Id = parseInt(id);
+                ajaxUrl = "/adminmenu/api/update";
+                ajaxMethod = "PUT";
+            }
+
+            $.ajax({
+                url: ajaxUrl,
+                type: ajaxMethod,
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                success: function(res) {
+                    resetFormToCreate();
+                    loadSidebarMockup();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: res.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload(); // Tải lại trang để cập nhật sidebar chính bên ngoài
+                    });
+                },
+                error: function(err) {
+                    if (err.status === 400 && err.responseJSON) {
+                        const errors = err.responseJSON;
+                        if (errors.errors) {
+                            for (const key in errors.errors) {
+                                showError(key, errors.errors[key][0]);
+                            }
+                        } else if (errors.message) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi trùng lặp',
+                                text: errors.message
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thất bại',
+                            text: 'Đã xảy ra lỗi trong quá trình ghi nhận!'
+                        });
+                    }
+                }
+            });
+        });
+
+        // Xóa menu
+        function deleteMenu(id, isSystem) {
+            if (isSystem) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cảnh báo',
+                    text: 'Đây là menu hệ thống. Bạn có chắc chắn muốn xóa vĩnh viễn không?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý xóa cứng',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#ef4444'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        executeDelete(id, true);
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Xác nhận xóa',
+                    text: "Bạn có chắc chắn muốn xóa menu này không? (Có thể khôi phục lại)",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý xóa',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#e07a5f'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        executeDelete(id, false);
+                    }
+                });
+            }
+        }
+
+        // Gọi API xóa
+        function executeDelete(id, isHardDelete) {
+            const url = isHardDelete 
+                ? `/adminmenu/api/hard-delete/${id}`
+                : `/adminmenu/api/delete/${id}`;
+
+            $.ajax({
+                url: url,
+                type: "DELETE",
+                success: function(res) {
+                    loadSidebarMockup();
+                    resetFormToCreate();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: res.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload(); // Tải lại trang để cập nhật sidebar chính bên ngoài
+                    });
+                },
+                error: function(err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: err.responseJSON?.message || 'Không thể xóa menu này. Hãy chắc chắn nó không chứa menu con!'
+                    });
+                }
+            });
+        }
+
+        // Hiện lỗi validation
+        function showError(fieldName, message) {
+            const inputField = $(`#${fieldName.charAt(0).toLowerCase() + fieldName.slice(1)}`);
+            inputField.addClass('is-invalid');
+            $(`#error${fieldName}`).text(message).show();
+        }
+
+        // Dọn lỗi
+        function clearErrors() {
+            $('.form-control').removeClass('is-invalid');
+            $('.field-error').text('').hide();
+        }
+
+        // JS helper đồng bộ tạo mã menuCode giống SlugHelper.GenerateCode
+        function generateMenuCodeJs(text) {
+            if (!text) return '';
+            
+            // 1. Chuyển chữ hoa
+            let str = text.toUpperCase();
+
+            // 2. Loại bỏ dấu tiếng Việt
+            const signedChars = "àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ";
+            const unsignedChars = "aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyydAAAAAAAAAAAAAAAAAEEEEEEEEEEEIIIIIOOOOOOOOOOOOOOOOOUUUUUUUUUUUYYYYYD";
+            let res = "";
+            for (let i = 0; i < str.length; i++) {
+                let idx = signedChars.indexOf(str[i]);
+                if (idx !== -1) {
+                    res += unsignedChars[idx];
+                } else {
+                    res += str[i];
+                }
+            }
+            str = res.toUpperCase();
+
+            // 3. Giữ lại chữ, số, khoảng trắng, gạch ngang, gạch dưới
+            str = str.replace(/[^A-Z0-9\s_-]/g, "");
+
+            // 4. Thay thế khoảng trắng và gạch dưới bằng gạch ngang (-)
+            str = str.replace(/[\s_]+/g, "-");
+            str = str.replace(/-+/g, "-");
+
+            // 5. Cắt các ký tự gạch ngang dư thừa ở đầu và cuối
+            if (str.startsWith('-')) str = str.substring(1);
+            if (str.endsWith('-')) str = str.substring(0, str.length - 1);
+
+            return str;
+        }
+    </script>
+}
