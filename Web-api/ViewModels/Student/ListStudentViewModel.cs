@@ -4,11 +4,13 @@
     {
         public long Id { get; set; }
         public string Name { get; set; } = null!;
-        public string ClassName { get; set; } = null!;
+        public string ClassName { get; set; }
+
         public string CitizenId { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public string GenderText { get; set; } = null!;
-        public string Province { get; set; } = null!;
+        public string Province { get; set; }
+
         public string Email { get; set; } = null!;
         public bool IsRetained { get; set; }
     }

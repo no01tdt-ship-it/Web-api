@@ -18,7 +18,25 @@ namespace Web_api.Services
 
         public async Task<bool> CreateStudentAsync(AddStudentViewModel viewModel)
         {
-            var schoolClass = await _studentRepository.GetClassByNameAsync(viewModel.ClassName);
+            var schoolClass = await _studentRepository.GetClassByIdAsync(viewModel.SchoolClassId);
+            if (schoolClass == null)
+            {
+                return false;
+            }
+            var province = await _studentRepository.GetProvinceByIdAsync(viewModel.ProvinceId);
+            if (province == null)
+            {
+                return false;
+            }
+            var ward = await _studentRepository.GetWardByIdAsync(viewModel.WardId);
+            if (ward == null)
+            {
+                return false;
+            }
+            if (ward.ProvinceId != province.Id)
+            {
+                return false;
+            }
             var student = new Student
             {
                 Name = viewModel.Name,
@@ -29,8 +47,8 @@ namespace Web_api.Services
                 BirthDay = viewModel.BirthDay,
                 CitizenId = viewModel.CitizenId,
                 PhoneNumber = viewModel.PhoneNumber,
-                Province = viewModel.Province,
-                Ward = viewModel.Ward,
+                ProvinceId = province?.Id,
+                WardId = ward?.Id,
                 Address = viewModel.Address,
                 Course = viewModel.Course
             };
@@ -41,7 +59,6 @@ namespace Web_api.Services
         public async Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters)
         {
             return await _studentRepository.ListServerSide(parameters);
-
 
         }
 
@@ -55,12 +72,12 @@ namespace Web_api.Services
                 {
                     Id = s.Id,
                     Name = s.Name,
-                    ClassName =  s.SchoolClass?.Name ?? "Chưa xếp lớp",
+                    ClassName = s.SchoolClass?.Name ?? "Chưa xếp lớp",
                     PhoneNumber = s.PhoneNumber,
                     GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
                                  s.Gender == GenderConstant.Nu ? "Nữ" :
                                  s.Gender == GenderConstant.Khac ? "Khác" : "Chưa chọn",
-                    Province = s.Province,
+                    Province = s.Province != null ? s.Province.Name : "",
                     Email = s.Email,
                     IsRetained = s.IsRetained
                 });
@@ -76,7 +93,7 @@ namespace Web_api.Services
             return new DetailStudentViewModel
             {
                 Name = s.Name,
-                ClassName = s.SchoolClass?.Name ?? "Chưa xếp lớp",
+                ClassName = s.SchoolClass?.Name,
                 Image = s.Image,
                 Gender = s.Gender,
                 GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
@@ -86,12 +103,15 @@ namespace Web_api.Services
                 BirthDay = s.BirthDay,
                 CitizenId = s.CitizenId,
                 PhoneNumber = s.PhoneNumber,
-                Province = s.Province,
-                Ward = s.Ward,
+                Province = s.Province != null ? s.Province.Name : "",
+                Ward = s.Ward != null ? s.Ward.Name : "",
                 Address = s.Address,
                 Course = s.Course,
                 IsRetained = s.IsRetained,
-                IsRetainedText = s.IsRetained ? "Bảo lưu" : "Đang học"
+                IsRetainedText = s.IsRetained ? "Bảo lưu" : "Đang học",
+                ProvinceId = s.ProvinceId,
+                WardId = s.WardId,
+                SchoolClassId = s.SchoolClassId
             };
 
         }
@@ -100,17 +120,23 @@ namespace Web_api.Services
         {
             var student = await _studentRepository.GetByIdAsync(model.Id);
             if (student == null) return false;
-            var schoolClass = await _studentRepository.GetClassByNameAsync(model.ClassName);
+            var schoolClass = await _studentRepository.GetClassByIdAsync(model.SchoolClassId);
+            if (schoolClass == null) return false;
+            var province = await _studentRepository.GetProvinceByIdAsync(model.ProvinceId);
+            if (province == null) return false;
+            var ward = await _studentRepository.GetWardByIdAsync(model.WardId);
+            if (ward == null) return false;
+            if (ward.ProvinceId != province.Id) return false;
 
             student.Name = model.Name;
-            student.SchoolClassId = schoolClass?.Id;
+            student.SchoolClassId = schoolClass.Id;
             student.Gender = model.Gender;
             student.Email = model.Email;
             student.BirthDay = model.BirthDay;
             student.CitizenId = model.CitizenId;
             student.PhoneNumber = model.PhoneNumber;
-            student.Province = model.Province;
-            student.Ward = model.Ward;
+            student.ProvinceId = province?.Id;
+            student.WardId = ward?.Id;
             student.Address = model.Address;
             student.Course = model.Course;
             student.IsRetained = model.IsRetained;
@@ -132,6 +158,21 @@ namespace Web_api.Services
             }
 
             await _studentRepository.DeleteAsync(student);
+        }
+
+        public async Task<List<SchoolClass>> GetClassesAsync()
+        {
+            return await _studentRepository.GetClassesAsync();
+        }
+
+        public async Task<List<Province>> GetProvincesAsync()
+        {
+            return await _studentRepository.GetProvincesAsync();
+        }
+
+        public async Task<List<Ward>> GetWardsByProvinceIdAsync(long provinceId)
+        {
+            return await _studentRepository.GetWardsByProvinceIdAsync(provinceId);
         }
     }
 }

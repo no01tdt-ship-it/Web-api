@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web_api.Data;
 
@@ -11,9 +12,11 @@ using Web_api.Data;
 namespace Web_api.Migrations
 {
     [DbContext(typeof(ApplicationDb))]
-    partial class ApplicationDbModelSnapshot : ModelSnapshot
+    [Migration("20260702025917_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,125 +24,6 @@ namespace Web_api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Web_api.Models.AdminMenu", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Mã menu");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1001L);
-
-                    b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasComment("Trạng thái hoạt động");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()")
-                        .HasComment("Ngày tạo");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasComment("Mô tả");
-
-                    b.Property<string>("Icon")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)")
-                        .HasComment("Icon menu");
-
-                    b.Property<bool>("IsSystem")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasComment("Menu hệ thống");
-
-                    b.Property<string>("MenuCode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasComment("Mã chức năng menu");
-
-                    b.Property<string>("MenuName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)")
-                        .HasComment("Tên menu");
-
-                    b.Property<long?>("ParentId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã menu cha");
-
-                    b.Property<int>("SortOrder")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0)
-                        .HasComment("Thứ tự hiển thị");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime")
-                        .HasComment("Ngày cập nhật");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)")
-                        .HasComment("Đường dẫn menu");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MenuCode")
-                        .IsUnique();
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("AdminMenu", (string)null);
-                });
-
-            modelBuilder.Entity("Web_api.Models.Province", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1001L);
-
-                    b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Không hoạt động)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasComment("Mã định danh tỉnh/thành phố");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()")
-                        .HasComment("Ngày tạo");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasComment("Tên tỉnh/thành phố");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.ToTable("Province", (string)null);
-                });
 
             modelBuilder.Entity("Web_api.Models.School", b =>
                 {
@@ -166,28 +50,24 @@ namespace Web_api.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasComment("Mã định danh trường");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()")
-                        .HasComment("Ngày tạo");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasComment("Tên trường học");
 
-                    b.Property<long?>("ProvinceId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố");
+                    b.Property<string>("Province")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Nhập tỉnh");
 
                     b.Property<long>("SchoolLevelId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("WardId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã phường/xã");
+                    b.Property<string>("Ward")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Nhập Xã");
 
                     b.HasKey("Id");
 
@@ -195,11 +75,7 @@ namespace Web_api.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.HasIndex("ProvinceId");
-
                     b.HasIndex("SchoolLevelId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("School", (string)null);
                 });
@@ -222,12 +98,6 @@ namespace Web_api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasComment("Mã định danh lớp");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()")
-                        .HasComment("Ngày tạo");
 
                     b.Property<int?>("Grade")
                         .HasColumnType("int")
@@ -272,12 +142,6 @@ namespace Web_api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasComment("Mã định danh cấp");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()")
-                        .HasComment("Ngày tạo");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -371,108 +235,37 @@ namespace Web_api.Migrations
                         .HasColumnType("nvarchar(12)")
                         .HasComment("Số điện thoại liên hệ");
 
-                    b.Property<long?>("ProvinceId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố");
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Tỉnh/Thành phố");
 
                     b.Property<long?>("SchoolClassId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("WardId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã phường/xã");
+                    b.Property<string>("Ward")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Phường/Xã");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProvinceId");
-
                     b.HasIndex("SchoolClassId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("Student", (string)null);
                 });
 
-            modelBuilder.Entity("Web_api.Models.Ward", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Mã phường/xã");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1001L);
-
-                    b.Property<bool>("Active")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasComment("Trạng thái hoạt động (True: Hoạt động, False: Không hoạt động)");
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasComment("Mã định danh phường/xã");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()")
-                        .HasComment("Ngày tạo");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasComment("Tên phường/xã");
-
-                    b.Property<long>("ProvinceId")
-                        .HasColumnType("bigint")
-                        .HasComment("Mã tỉnh/thành phố trực thuộc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL");
-
-                    b.HasIndex("ProvinceId");
-
-                    b.ToTable("Ward", (string)null);
-                });
-
-            modelBuilder.Entity("Web_api.Models.AdminMenu", b =>
-                {
-                    b.HasOne("Web_api.Models.AdminMenu", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("Web_api.Models.School", b =>
                 {
-                    b.HasOne("Web_api.Models.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Web_api.Models.SchoolLevel", "SchoolLevel")
                         .WithMany("Schools")
                         .HasForeignKey("SchoolLevelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Web_api.Models.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Province");
-
                     b.Navigation("SchoolLevel");
-
-                    b.Navigation("Ward");
                 });
 
             modelBuilder.Entity("Web_api.Models.SchoolClass", b =>
@@ -488,47 +281,12 @@ namespace Web_api.Migrations
 
             modelBuilder.Entity("Web_api.Models.Student", b =>
                 {
-                    b.HasOne("Web_api.Models.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Web_api.Models.SchoolClass", "SchoolClass")
                         .WithMany("Students")
                         .HasForeignKey("SchoolClassId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Web_api.Models.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Province");
-
                     b.Navigation("SchoolClass");
-
-                    b.Navigation("Ward");
-                });
-
-            modelBuilder.Entity("Web_api.Models.Ward", b =>
-                {
-                    b.HasOne("Web_api.Models.Province", "Province")
-                        .WithMany("Wards")
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Province");
-                });
-
-            modelBuilder.Entity("Web_api.Models.AdminMenu", b =>
-                {
-                    b.Navigation("Children");
-                });
-
-            modelBuilder.Entity("Web_api.Models.Province", b =>
-                {
-                    b.Navigation("Wards");
                 });
 
             modelBuilder.Entity("Web_api.Models.School", b =>

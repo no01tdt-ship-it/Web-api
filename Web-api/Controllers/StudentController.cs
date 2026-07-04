@@ -31,11 +31,19 @@ namespace Web_api.Controllers
             try
             {
                 var isSuccess = await _studentService.CreateStudentAsync(viewModel);
-                if (isSuccess)
+                if (!isSuccess)
                 {
-                    return Ok(new { success = true, message = "Thêm mới học sinh thành công!" });
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Lớp, tỉnh/thành phố hoặc xã/phường không hợp lệ hoặc đang ngừng hoạt động."
+                    });
                 }
-                return BadRequest(new { success = false, message = "Không thể lưu dữ liệu." });
+                return Ok(new
+                {
+                    success = true,
+                    message = "Thêm mới học sinh thành công!"
+                });
             }
             catch (Exception ex)
             {
@@ -132,5 +140,46 @@ namespace Web_api.Controllers
             }
         }
 
+        [HttpGet("api/classes")]
+        public async Task<IActionResult> GetClasses()
+        {
+            try
+            {
+                var classes = await _studentService.GetClassesAsync();
+                return Ok(classes.Select(c => new { id = c.Id, name = c.Name }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
+
+        [HttpGet("api/provinces")]
+        public async Task<IActionResult> GetProvinces()
+        {
+            try
+            {
+                var provinces = await _studentService.GetProvincesAsync();
+                return Ok(provinces.Select(p => new { id = p.Id, name = p.Name }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
+
+        [HttpGet("api/wards/{provinceId}")]
+        public async Task<IActionResult> GetWards(long provinceId)
+        {
+            try
+            {
+                var wards = await _studentService.GetWardsByProvinceIdAsync(provinceId);
+                return Ok(wards.Select(w => new { id = w.Id, name = w.Name }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
     }
 }

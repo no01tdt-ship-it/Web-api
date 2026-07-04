@@ -12,8 +12,7 @@ namespace Web_api.ViewModels.Student
         public string Name { get; set; } = null!;
 
         [Required(ErrorMessage = "Tên lớp không được để trống.")]
-        [MaxLength(50, ErrorMessage = "Tên lớp không được vượt quá 50 ký tự.")]
-        public string ClassName { get; set; } = null!;
+        public long SchoolClassId { get; set; }
 
         [MaxLength(250, ErrorMessage = "Ảnh không được vượt quá 250 ký tự.")]
         public string? Image { get; set; }
@@ -39,11 +38,10 @@ namespace Web_api.ViewModels.Student
         public string PhoneNumber { get; set; } = null!;
 
         [Required(ErrorMessage = "Tỉnh không được để trống.")]
-        [StringLength(50, ErrorMessage = "Tỉnh không được vượt quá 50 ký tự.")]
-        public string Province { get; set; } = null!;
+        public long ProvinceId { get; set; }
+        [Required(ErrorMessage = "Xã không được để trống.")]
 
-        [StringLength(50, ErrorMessage = "Phường không được vượt quá 50 ký tự.")]
-        public string? Ward { get; set; }
+        public long WardId { get; set; }
 
         [StringLength(250, ErrorMessage = "Địa chỉ không được vượt quá 250 ký tự.")]
         public string? Address { get; set; }
@@ -53,6 +51,8 @@ namespace Web_api.ViewModels.Student
 
         [Required(ErrorMessage = "Trạng thái không được để trống.")]
         public bool IsRetained { get; set; }
+
+
 
     }
 }

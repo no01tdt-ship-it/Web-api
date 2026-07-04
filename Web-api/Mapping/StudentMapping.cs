@@ -55,14 +55,21 @@ namespace Web_api.Mapping
                    .HasMaxLength(12)
                    .HasComment("Số điện thoại liên hệ");
 
-            entity.Property(s => s.Province)
-                   .IsRequired()
-                   .HasMaxLength(50)
-                   .HasComment("Tỉnh/Thành phố");
+            entity.Property(s => s.ProvinceId)
+                   .HasComment("Mã tỉnh/thành phố");
 
-            entity.Property(s => s.Ward)
-                   .HasMaxLength(50)
-                   .HasComment("Phường/Xã");
+            entity.Property(s => s.WardId)
+                   .HasComment("Mã phường/xã");
+
+            entity.HasOne(s => s.Province)
+                   .WithMany()
+                   .HasForeignKey(s => s.ProvinceId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(s => s.Ward)
+                   .WithMany()
+                   .HasForeignKey(s => s.WardId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             entity.Property(s => s.Address)
                    .HasMaxLength(100)

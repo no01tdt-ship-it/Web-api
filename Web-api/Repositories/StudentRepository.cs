@@ -32,18 +32,32 @@ namespace Web_api.Repositories
 
         public async Task<List<Student>> GetAllAsync()
         {
-            return await _context.Students.Include(s => s.SchoolClass).AsNoTracking().ToListAsync();
+            return await _context.Students
+                .Include(s => s.SchoolClass)
+                .Include(s => s.Province)
+                .Include(s => s.Ward)
+                .AsNoTracking().ToListAsync();
         }
 
         public async Task<Student?> GetByIdAsync(long id)
         {
-            return await _context.Students.Include(s => s.SchoolClass).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+            return await _context.Students
+                .Include(s => s.SchoolClass)
+                .Include(s => s.Province)
+                .Include(s => s.Ward)
+                .AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<DTResult<ListStudentViewModel>> ListServerSide(StudentViewModelParameters parameters)
         {
             // 1. Khởi tạo câu truy vấn gốc không theo dõi (AsNoTracking để tăng tốc độ truy vấn)
-            var query = _context.Students.AsNoTracking();
+            var query = _context.Students
+                .Where(s => s.Active
+                && (s.SchoolClass == null || s.SchoolClass.Active)
+                && (s.Province == null || s.Province.Active)
+                && (s.Ward == null || s.Ward.Active)
+                )
+                .AsNoTracking();
 
             // 2. Đếm tổng số bản ghi thực tế trong DB khi chưa áp dụng lọc tìm kiếm
             var totalRecords = await query.CountAsync();
@@ -54,10 +68,11 @@ namespace Web_api.Repositories
             {
                 var searchLower = searchAll.ToLower();
                 query = query.Where(s =>
-                    s.Name.ToLower().Contains(searchLower) ||
-                    s.Email.ToLower().Contains(searchLower) ||
-                    s.PhoneNumber.ToLower().Contains(searchLower) ||
-                    s.Province.ToLower().Contains(searchLower) ||
+                    (!string.IsNullOrEmpty(s.Name) && s.Name.ToLower().Contains(searchLower)) ||
+                    (!string.IsNullOrEmpty(s.Email) && s.Email.ToLower().Contains(searchLower)) ||
+                    (!string.IsNullOrEmpty(s.PhoneNumber) && s.PhoneNumber.ToLower().Contains(searchLower)) ||
+                    (!string.IsNullOrEmpty(s.CitizenId) && s.CitizenId.ToLower().Contains(searchLower)) ||
+                    s.Province != null && s.Province.Name.ToLower().Contains(searchLower) ||
                     s.CitizenId.ToLower().Contains(searchLower) ||
                     s.SchoolClass != null && s.SchoolClass.Name.ToLower().Contains(searchLower)
                 );
@@ -90,7 +105,7 @@ namespace Web_api.Repositories
                     GenderText = s.Gender == GenderConstant.Nam ? "Nam" :
                                  s.Gender == GenderConstant.Nu ? "Nữ" :
                                  s.Gender == GenderConstant.Khac ? "Khác" : "Chưa chọn",
-                    Province = s.Province,
+                    Province = s.Province != null ? s.Province.Name : "",
                     Email = s.Email,
                     IsRetained = s.IsRetained
                 })
@@ -120,10 +135,34 @@ namespace Web_api.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<SchoolClass?> GetClassByNameAsync(string className)
+        public async Task<SchoolClass?> GetClassByIdAsync(long Id)
         {
-            return await _context.Set<SchoolClass>().FirstOrDefaultAsync(c => c.Name == className);
+            return await _context.SchoolClasses.FirstOrDefaultAsync(c => c.Id == Id && c.Active);
         }
 
+        public async Task<Province?> GetProvinceByIdAsync(long Id)
+        {
+            return await _context.Provinces.FirstOrDefaultAsync(p => p.Id == Id && p.Active);
+        }
+
+        public async Task<Ward?> GetWardByIdAsync(long Id)
+        {
+            return await _context.Wards.FirstOrDefaultAsync(w => w.Id == Id && w.Active);
+        }
+
+        public async Task<List<SchoolClass>> GetClassesAsync()
+        {
+            return await _context.SchoolClasses.Where(c => c.Active).ToListAsync();
+        }
+
+        public async Task<List<Province>> GetProvincesAsync()
+        {
+            return await _context.Provinces.Where(p => p.Active).ToListAsync();
+        }
+
+        public async Task<List<Ward>> GetWardsByProvinceIdAsync(long provinceId)
+        {
+            return await _context.Wards.Where(w => w.ProvinceId == provinceId && w.Active).ToListAsync();
+        }
     }
 }
