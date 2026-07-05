@@ -4,28 +4,89 @@
 }
 
 <style>
-    /* Bố cục chia cột: Cột 1 xem trước Sidebar, Cột 2 là Form điền dữ liệu */
+    /* Căn giữa bảng xem trước Sidebar làm trung tâm */
     .menu-editor-layout {
-        display: grid;
-        grid-template-columns: 320px 1fr; /* 320px sidebar preview, rest is form */
-        gap: 30px;
-        align-items: start;
+        display: flex;
+        justify-content: center;
         margin-top: 15px;
     }
 
-    @@media (max-width: 992px) {
-        .menu-editor-layout {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .menu-preview-panel, .menu-form-panel {
+    .menu-preview-panel {
+        width: 100%;
+        max-width: 500px;
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
         box-shadow: var(--shadow-glass);
         padding: 24px;
         backdrop-filter: blur(8px);
+    }
+
+    .menu-form-panel {
+        padding: 24px;
+    }
+
+    /* Custom Modal Overlay */
+    .custom-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+    }
+
+    .custom-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .custom-modal-content {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        width: 90%;
+        max-width: 750px;
+        max-height: 90vh;
+        overflow-y: auto;
+        transform: translateY(-20px);
+        transition: transform 0.25s ease-in-out;
+        position: relative;
+    }
+
+    .custom-modal-overlay.active .custom-modal-content {
+        transform: translateY(0);
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    .modal-close-btn:hover {
+        background-color: var(--bg-main);
+        color: var(--danger);
     }
 
     .panel-header {
@@ -275,6 +336,11 @@
             <h1>Cấu Hình Thiết Kế Sidebar Menu</h1>
             <p>Xem trước trực tiếp cấu trúc hiển thị sidebar bên ngoài. Nhấp để chỉnh sửa hoặc thêm menu mới.</p>
         </div>
+        <div>
+            <button type="button" class="btn btn-primary" onclick="openCreateModal()">
+                <i class="fa-solid fa-plus"></i> Thêm Mới Menu
+            </button>
+        </div>
     </header>
 
     <!-- Stats Grid Widgets -->
@@ -327,14 +393,16 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Form Thiết Kế Nhập Liệu (Bên phải) -->
+<!-- Modal Thêm Mới / Cập Nhật Menu -->
+<div class="custom-modal-overlay" id="menuFormModal" onclick="handleOutsideClick(event)">
+    <div class="custom-modal-content">
+        <button type="button" class="modal-close-btn" onclick="closeFormModal()" title="Đóng">&times;</button>
         <div class="menu-form-panel">
             <div class="panel-header">
                 <h3 id="formTitle"><i class="fa-solid fa-pen-to-square"></i> Thêm Mới Menu</h3>
-                <button type="button" class="btn btn-secondary" id="btnCancelEdit" style="display: none; padding: 6px 12px; font-size: 12px;" onclick="resetFormToCreate()">
-                    <i class="fa-solid fa-xmark"></i> Hủy sửa
-                </button>
             </div>
 
             <form id="menuForm" novalidate>
@@ -409,7 +477,7 @@
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
-                    <button type="button" class="btn btn-secondary" onclick="resetFormToCreate()">Hủy Bỏ / Reset</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeFormModal()">Hủy Bỏ</button>
                     <button type="submit" class="btn btn-primary" id="btnSubmit">Lưu Thông Tin</button>
                 </div>
             </form>
@@ -550,11 +618,39 @@
             $('#statSystem').text(data.filter(m => m.isSystem).length);
         }
 
+        // Modal Helper Functions
+        function openModal() {
+            $('#menuFormModal').addClass('active');
+            $('body').css('overflow', 'hidden'); // Ngăn cuộn trang chính khi đang mở modal
+        }
+
+        function closeModal() {
+            $('#menuFormModal').removeClass('active');
+            $('body').css('overflow', ''); // Khôi phục cuộn trang
+        }
+
+        function handleOutsideClick(e) {
+            if (e.target.id === 'menuFormModal') {
+                closeFormModal();
+            }
+        }
+
+        function openCreateModal() {
+            resetFormToCreate();
+            openModal();
+        }
+
+        function closeFormModal() {
+            closeModal();
+            resetFormToCreate();
+        }
+
         // Thiết lập nhanh khi click "Thêm menu con"
         function addChildMenu(parentId) {
             resetFormToCreate();
             loadParentMenus(parentId);
-            $('#menuName').focus();
+            openModal();
+            setTimeout(() => $('#menuName').focus(), 150);
         }
 
         // Kích hoạt chế độ chỉnh sửa sửa đổi
@@ -575,11 +671,9 @@
                     $('#description').val(menu.description || '');
 
                     $('#formTitle').html('<i class="fa-solid fa-pen-to-square"></i> Cập Nhật Menu: <span class="text-primary">' + menu.menuName + '</span>');
-                    $('#btnCancelEdit').show();
                     
                     loadParentMenus(menu.parentId);
-                    // Cuộn trang nhẹ nhàng sang form
-                    $('.menu-form-panel')[0].scrollIntoView({ behavior: 'smooth' });
+                    openModal();
                 },
                 error: function() {
                     Swal.fire({
@@ -597,7 +691,6 @@
             menuForm.reset();
             $('#menuId').val('');
             $('#formTitle').html('<i class="fa-solid fa-pen-to-square"></i> Thêm Mới Menu');
-            $('#btnCancelEdit').hide();
             
             // Checkbox mặc định
             $('#isSystem').prop('checked', false);
@@ -656,6 +749,7 @@
                 contentType: "application/json",
                 data: JSON.stringify(payload),
                 success: function(res) {
+                    closeModal();
                     resetFormToCreate();
                     loadSidebarMockup();
                     Swal.fire({
