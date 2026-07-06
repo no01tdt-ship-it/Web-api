@@ -1,1 +1,92 @@
-﻿
+@inject Web_api.Interfaces.IServices.IAdminMenuService AdminMenuService
+@{
+    var allMenus = await AdminMenuService.GetAllAsync();
+    var activeMenus = allMenus.Where(m => m.Active).ToList();
+    var parentMenus = activeMenus.Where(m => m.ParentId == null).OrderBy(m => m.SortOrder).ToList();
+    
+    // Lấy đường dẫn hiện tại để active menu tương ứng
+    var currentPath = Context.Request.Path.Value ?? "";
+}
+
+<aside class="app-sidebar">
+    <!-- Logo / Brand Header -->
+    <div class="sidebar-brand">
+        <i class="fa-solid fa-graduation-cap brand-icon"></i>
+        <span class="brand-name">Portal Admin</span>
+    </div>
+    
+    <!-- Menu Điều Hướng -->
+    <div class="sidebar-menu-wrapper">
+        <nav class="sidebar-menu-nav">
+            <ul class="sidebar-menu">
+                @foreach (var parent in parentMenus)
+                {
+                    var children = activeMenus.Where(m => m.ParentId == parent.Id).OrderBy(m => m.SortOrder).ToList();
+                    var hasChildren = children.Any();
+                    
+                    // Kiểm tra active cho menu cha và menu con
+                    var isParentActive = !string.IsNullOrEmpty(parent.Url) && currentPath.StartsWith(parent.Url, StringComparison.OrdinalIgnoreCase);
+                    var isChildActive = children.Any(c => !string.IsNullOrEmpty(c.Url) && currentPath.StartsWith(c.Url, StringComparison.OrdinalIgnoreCase));
+                    var isExpanded = isParentActive || isChildActive;
+
+                    <li class="menu-item @(hasChildren ? "has-submenu" : "")">
+                        @if (hasChildren)
+                        {
+                            <a class="menu-link @(isExpanded ? "" : "collapsed") @(isChildActive ? "active" : "")" onclick="toggleSubmenu(this)">
+                                <span>
+                                    @if (!string.IsNullOrEmpty(parent.Icon))
+                                    {
+                                        <i class="@parent.Icon menu-icon"></i>
+                                    }
+                                    @parent.MenuName
+                                </span>
+                                <i class="fa-solid fa-chevron-down menu-arrow"></i>
+                            </a>
+                            <ul class="submenu" style="max-height: @(isExpanded ? "500px" : "0px");">
+                                @foreach (var child in children)
+                                {
+                                    var isCurrentChildActive = !string.IsNullOrEmpty(child.Url) && currentPath.Equals(child.Url, StringComparison.OrdinalIgnoreCase);
+                                    <li>
+                                        <a href="@child.Url" class="submenu-link @(isCurrentChildActive ? "active" : "")">
+                                            @if (!string.IsNullOrEmpty(child.Icon))
+                                            {
+                                                <i class="@child.Icon menu-icon"></i>
+                                            }
+                                            @child.MenuName
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <a href="@parent.Url" class="menu-link @(isParentActive ? "active" : "")">
+                                <span>
+                                    @if (!string.IsNullOrEmpty(parent.Icon))
+                                    {
+                                        <i class="@parent.Icon menu-icon"></i>
+                                    }
+                                    @parent.MenuName
+                                </span>
+                            </a>
+                        }
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</aside>
+
+<script>
+    function toggleSubmenu(element) {
+        element.classList.toggle("collapsed");
+        const submenu = element.nextElementSibling;
+        if (submenu) {
+            if (element.classList.contains("collapsed")) {
+                submenu.style.maxHeight = "0px";
+            } else {
+                submenu.style.maxHeight = "500px"; // Giới hạn chiều cao tối đa cho hiệu ứng mở mượt
+            }
+        }
+    }
+</script>

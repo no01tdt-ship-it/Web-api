@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Web_api.Interfaces.IRepositories;
 using Web_api.Interfaces.IServices;
 using Web_api.Repositories;
@@ -13,13 +13,12 @@ namespace Web_api.Extensions
         {
             // 1.Đăng ký nhóm Repositories
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IAdminMenuRepository, AdminMenuRepository>();
 
             // 2. Đăng ký nhóm Services
             services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IAdminMenuService, AdminMenuService>();
 
-
-
-            
             return services;
 
         }
